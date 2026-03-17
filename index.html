@@ -1524,7 +1524,7 @@
     async function loadAircraft() {
       const cfg = regionConfigs[currentRegion];
       const b = cfg.bounds;
-      const url = `https://opensky-network.org/api/states/all?lamin=${b.lamin}&lamax=${b.lamax}&lomin=${b.lomin}&lomax=${b.lomax}`;
+      const url = `https://spyair-api.mlodykawa.workers.dev/api/states?lamin=${b.lamin}&lamax=${b.lamax}&lomin=${b.lomin}&lomax=${b.lomax}`;
       mapStatus.textContent = "Refreshing live data…";
 
       try {
