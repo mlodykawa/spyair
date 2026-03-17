@@ -14,21 +14,19 @@
     content="Track military aircraft activity in real time with alerts, watchlists, and route history."
   />
   <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#06101c" />
+
   <style>
     :root {
       --bg: #06101c;
       --bg-soft: #0b1626;
       --panel: rgba(255, 255, 255, 0.05);
-      --panel-strong: rgba(255, 255, 255, 0.08);
       --border: rgba(255, 255, 255, 0.10);
       --border-strong: rgba(125, 211, 252, 0.22);
       --text: #f3f7fc;
       --muted: #9eb0c8;
       --accent: #7dd3fc;
       --accent-2: #93c5fd;
-      --accent-3: #67e8f9;
-      --success: #86efac;
-      --warning: #fcd34d;
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
       --radius: 22px;
       --max-width: 1160px;
@@ -55,11 +53,6 @@
     a {
       color: inherit;
       text-decoration: none;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
     }
 
     .container {
@@ -242,9 +235,7 @@
       opacity: 0.55;
     }
 
-    .ring-1,
-    .ring-2,
-    .ring-3 {
+    .ring-1, .ring-2, .ring-3 {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -277,13 +268,10 @@
     }
 
     @keyframes rotate {
-      to {
-        transform: translate(-50%, -50%) rotate(360deg);
-      }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
-    .cross-x,
-    .cross-y {
+    .cross-x, .cross-y {
       position: absolute;
       background: rgba(255, 255, 255, 0.06);
     }
@@ -618,27 +606,34 @@
       line-height: 1.75;
     }
 
-    .waitlist-form {
+    .waitlist-box {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
-      flex-wrap: wrap;
+      align-items: center;
     }
 
-    .waitlist-form input {
-      flex: 1 1 240px;
-      min-width: 220px;
-      padding: 15px 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
+    .coming-soon {
+      width: 100%;
+      max-width: 420px;
+      padding: 18px;
+      border-radius: 18px;
       background: rgba(255,255,255,0.05);
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
+      border: 1px solid rgba(255,255,255,0.10);
+      text-align: center;
     }
 
-    .waitlist-form input::placeholder {
-      color: #89a0bb;
+    .coming-soon strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .coming-soon span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      display: block;
+      margin-bottom: 14px;
     }
 
     .disclaimer {
@@ -674,7 +669,7 @@
         grid-template-columns: 1fr;
       }
 
-      .waitlist-form {
+      .waitlist-box {
         justify-content: flex-start;
       }
     }
@@ -713,12 +708,12 @@
         <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
-        <a class="btn btn-secondary" href="#waitlist">Join waitlist</a>
+        <a class="btn btn-secondary" href="#waitlist">Early access</a>
       </div>
     </div>
   </nav>
 
-  <header class="hero">
+  <header class="hero" id="top">
     <div class="container hero-grid">
       <div class="hero-copy">
         <div class="eyebrow">OSINT air activity monitor</div>
@@ -919,7 +914,7 @@
             <div class="price-item">Historical replay and route history</div>
             <div class="price-item">Regional monitoring tools</div>
           </div>
-          <a class="btn btn-primary" href="#waitlist">Join waitlist</a>
+          <a class="btn btn-primary" href="#waitlist">Request access</a>
         </div>
 
         <div class="price-card">
@@ -932,7 +927,7 @@
             <div class="price-item">Priority support</div>
             <div class="price-item">Custom data workflows</div>
           </div>
-          <a class="btn btn-secondary" href="#waitlist">Contact us</a>
+          <a class="btn btn-secondary" href="#waitlist">Contact later</a>
         </div>
       </div>
     </div>
@@ -962,7 +957,7 @@
         </div>
         <div class="faq-item">
           <strong>Can I get early access?</strong>
-          <span>Yes. Join the waitlist below and you will be among the first to hear when early access opens.</span>
+          <span>Yes. Early access will open soon. This page is the first public version of SpyAir.</span>
         </div>
       </div>
     </div>
@@ -972,20 +967,24 @@
     <div class="container">
       <div class="waitlist">
         <div>
-          <h3>Get early access to SpyAir</h3>
+          <h3>Early access is opening soon</h3>
           <p>
-            Join the waitlist and be first to test the military aircraft tracker,
-            live monitoring dashboard, alerts, and route history.
+            SpyAir is in early development. The landing page is live now, and the first private version will follow next.
           </p>
           <div class="disclaimer">
-            This is an early landing page. The email form is currently a placeholder until we connect a real waitlist backend.
+            Next step: connect a waitlist, Telegram, Discord, or X profile when you are ready.
           </div>
         </div>
 
-        <form class="waitlist-form">
-          <input type="email" placeholder="Enter your email" />
-          <button class="btn btn-primary" type="submit">Join waitlist</button>
-        </form>
+        <div class="waitlist-box">
+          <div class="coming-soon">
+            <strong>Coming soon</strong>
+            <span>
+              Live tracking, alerts, watchlists, and route history are currently being prepared.
+            </span>
+            <a class="btn btn-primary" href="#top">SpyAir v1</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
