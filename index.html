@@ -740,15 +740,15 @@
         <div class="eyebrow">FR24-powered live prototype</div>
         <h1>Track aircraft activity with real data.</h1>
         <p>
-          SpyAir combines live flight data, military-likely filtering, regional views,
-          watchlists, and a running alert feed in one interface.
+          SpyAir combines live flight data, military-likely filtering,
+          regional views, watchlists, and a running alert feed in one interface.
         </p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#map">Open live map</a>
           <a class="btn btn-secondary" href="#features">See features</a>
         </div>
         <div class="hero-note">
-          Worker API • watchlists • regions • live alerts • fallback mode
+          FR24 data • watchlists • regions • live alerts • smooth fallback
         </div>
       </div>
 
@@ -797,7 +797,7 @@
       <div class="map-shell">
         <div class="map-topbar">
           <div class="badges">
-            <div class="badge">Worker API</div>
+            <div class="badge">FR24 source</div>
             <div class="badge">Auto refresh</div>
             <div class="badge" id="regionBadge">Region: Poland</div>
             <div class="badge" id="modeBadge">Mode: Live</div>
@@ -865,16 +865,16 @@
       <div class="section-head">
         <h2 class="section-title">What this version does</h2>
         <p class="section-subtitle">
-          It behaves like a proper live monitoring prototype and still degrades gracefully if the upstream feed fails.
+          It already behaves like a proper live monitoring prototype instead of a placeholder page.
         </p>
       </div>
 
       <div class="cards">
         <div class="card">
-          <div class="icon">🛰️</div>
-          <h3>Live + fallback mode</h3>
+          <div class="icon">📡</div>
+          <h3>Real source</h3>
           <p>
-            If the live feed fails, SpyAir falls back to demo data instead of looking broken.
+            Your Worker now serves real FR24-backed data instead of OpenSky or static mock-only mode.
           </p>
         </div>
 
@@ -890,7 +890,7 @@
           <div class="icon">🚨</div>
           <h3>Useful alert feed</h3>
           <p>
-            New flights, watchlist hits, entries into region, and disappearances show up in the live alert panel.
+            New flights, watchlist hits, entries into region, and disappearances show up in the alert panel.
           </p>
         </div>
       </div>
@@ -912,12 +912,12 @@
           <span>No. It is a first-pass classifier based on callsign patterns and watchlist logic.</span>
         </div>
         <div class="faq-item">
-          <strong>Why does fallback mode exist?</strong>
-          <span>Because live upstream feeds can fail. Fallback prevents the UI from looking dead while you keep building.</span>
+          <strong>Why are some fields missing?</strong>
+          <span>Your current normalized FR24 response has heading and altitude, but speed and country can be null or unknown depending on the source record.</span>
         </div>
         <div class="faq-item">
           <strong>What should come next?</strong>
-          <span>Server-side filtering, persistent history, stronger watchlists, and backend alerting.</span>
+          <span>Server-side enrichment, smoother map rendering, trails, and a more Flightradar-like visualization layer.</span>
         </div>
       </div>
     </div>
@@ -938,14 +938,6 @@
 
   <script>
     const API_BASE = "https://spyair-api.mlodykawa.workers.dev";
-
-    const DEMO_FLIGHTS = [
-      { id: "demo01", callsign: "RCH102", lat: 52.21, lon: 21.01, altitude: 9400, speed: 225, heading: 110, country: "United States" },
-      { id: "demo02", callsign: "FORTE12", lat: 54.55, lon: 18.52, altitude: 15100, speed: 180, heading: 70, country: "United States" },
-      { id: "demo03", callsign: "LOT381", lat: 50.07, lon: 19.95, altitude: 10100, speed: 205, heading: 260, country: "Poland" },
-      { id: "demo04", callsign: "NATO42", lat: 53.40, lon: 14.55, altitude: 11600, speed: 212, heading: 35, country: "Belgium" },
-      { id: "demo05", callsign: "DLH7AB", lat: 51.76, lon: 19.46, altitude: 8800, speed: 190, heading: 190, country: "Germany" }
-    ];
 
     const regionConfigs = {
       poland: {
@@ -978,7 +970,8 @@
       "RCH", "RRR", "MMF", "NATO", "BAF", "QID", "CNV", "HKY", "ASY",
       "AME", "SHEP", "DUKE", "LAGR", "BRK", "REDEYE", "FORTE", "JAKE",
       "NAVY", "VM", "MC", "RAFAIR", "PACK", "MOOSE", "GAF", "IAF", "CTM",
-      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM"
+      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM",
+      "PLF"
     ];
 
     const map = L.map("mapContainer", { zoomControl: true }).setView([52.1, 19.4], 6);
@@ -1055,14 +1048,14 @@
       return text || fallback;
     }
 
-    function formatAlt(meters) {
-      if (meters === null || meters === undefined) return "Unknown";
-      return Math.round(meters * 3.28084).toLocaleString() + " ft";
+    function formatAlt(feet) {
+      if (feet === null || feet === undefined) return "Unknown";
+      return Math.round(feet).toLocaleString() + " ft";
     }
 
-    function formatSpeed(ms) {
-      if (ms === null || ms === undefined) return "Unknown";
-      return Math.round(ms * 1.94384) + " kt";
+    function formatSpeed(knots) {
+      if (knots === null || knots === undefined) return "Unknown";
+      return Math.round(knots) + " kt";
     }
 
     function currentFocusBox() {
@@ -1119,7 +1112,7 @@
       return [...flights].sort((a, b) => {
         if (a.watchHit !== b.watchHit) return a.watchHit ? -1 : 1;
         if (a.militaryLikely !== b.militaryLikely) return a.militaryLikely ? -1 : 1;
-        return (b.velocity || 0) - (a.velocity || 0);
+        return (b.baroAltitude || 0) - (a.baroAltitude || 0);
       });
     }
 
@@ -1333,10 +1326,10 @@
     function loadWatchlist() {
       try {
         const raw = localStorage.getItem("spyair_watchlist");
-        const parsed = raw ? JSON.parse(raw) : ["RCH", "FORTE", "NATO", "ASCOT"];
-        return Array.isArray(parsed) ? parsed.map(v => String(v).toUpperCase()) : ["RCH", "FORTE", "NATO", "ASCOT"];
+        const parsed = raw ? JSON.parse(raw) : ["RCH", "FORTE", "NATO", "ASCOT", "PLF"];
+        return Array.isArray(parsed) ? parsed.map(v => String(v).toUpperCase()) : ["RCH", "FORTE", "NATO", "ASCOT", "PLF"];
       } catch {
-        return ["RCH", "FORTE", "NATO", "ASCOT"];
+        return ["RCH", "FORTE", "NATO", "ASCOT", "PLF"];
       }
     }
 
@@ -1402,6 +1395,8 @@
         throw new Error(data.error || "No valid flight data");
       }
 
+      modeBadge.textContent = data.source === "fr24" ? "Mode: Live" : "Mode: Fallback";
+
       return sortFlights(
         data.flights
           .filter((f) =>
@@ -1415,26 +1410,17 @@
       );
     }
 
-    function fallbackFlights() {
-      return sortFlights(DEMO_FLIGHTS.map(normalizeFlight));
-    }
-
     async function loadAircraft() {
       mapStatus.textContent = "Refreshing live data…";
 
       try {
-        modeBadge.textContent = "Mode: Live";
         currentFlights = await fetchFlights();
         detectAlerts(currentFlights);
         applyCurrentFilter();
         mapStatus.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
       } catch (error) {
         console.error(error);
-        modeBadge.textContent = "Mode: Fallback";
-        currentFlights = fallbackFlights();
-        detectAlerts(currentFlights);
-        applyCurrentFilter();
-        mapStatus.textContent = "Live feed unavailable — showing fallback demo data.";
+        mapStatus.textContent = "Live feed unavailable.";
       }
     }
 
