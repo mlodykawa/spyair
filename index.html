@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpyAir — Live aircraft tracking</title>
+  <title>SpyAir — OSINT air activity monitor</title>
   <meta
     name="description"
-    content="SpyAir is a live aircraft tracking prototype with military-likely filtering, alerts, watchlists, and regional monitoring."
+    content="SpyAir tracks aircraft activity with live data, military-likely filtering, alerts, watchlists, and regional monitoring."
   />
-  <meta property="og:title" content="SpyAir — Live aircraft tracking" />
+  <meta property="og:title" content="SpyAir — OSINT air activity monitor" />
   <meta
     property="og:description"
-    content="Track aircraft activity in real time with live OpenSky data, military-likely filtering, alerts, watchlists, and regions."
+    content="Live aircraft tracking with military-likely filtering, alerts, watchlists, and regional monitoring."
   />
   <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#06101c" />
+  <meta name="theme-color" content="#07111f" />
 
   <link
     rel="stylesheet"
@@ -25,23 +25,21 @@
 
   <style>
     :root {
-      --bg: #06101c;
-      --panel: rgba(255, 255, 255, 0.05);
-      --panel-2: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.10);
-      --border-strong: rgba(125, 211, 252, 0.22);
-      --text: #f3f7fc;
-      --muted: #9eb0c8;
+      --bg: #07111f;
+      --bg-2: #0b1728;
+      --panel: rgba(255,255,255,0.05);
+      --panel-2: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.10);
+      --text: #f4f7fb;
+      --muted: #9db0ca;
       --accent: #7dd3fc;
       --accent-2: #93c5fd;
       --danger: #fca5a5;
-      --danger-2: #fecaca;
       --success: #86efac;
-      --success-2: #dcfce7;
       --warning: #fcd34d;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --shadow: 0 24px 70px rgba(0,0,0,0.35);
       --radius: 22px;
-      --max-width: 1260px;
+      --max: 1260px;
     }
 
     * { box-sizing: border-box; }
@@ -52,22 +50,16 @@
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top right, rgba(125, 211, 252, 0.12), transparent 22%),
-        radial-gradient(circle at 12% 30%, rgba(147, 197, 253, 0.08), transparent 18%),
+        radial-gradient(circle at top right, rgba(125, 211, 252, 0.13), transparent 22%),
+        radial-gradient(circle at 10% 30%, rgba(147, 197, 253, 0.08), transparent 18%),
         linear-gradient(180deg, #05101b 0%, #081321 100%);
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button, input {
-      font: inherit;
-    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
 
     .container {
-      width: min(var(--max-width), calc(100% - 32px));
+      width: min(var(--max), calc(100% - 32px));
       margin: 0 auto;
     }
 
@@ -75,46 +67,40 @@
       position: sticky;
       top: 0;
       z-index: 60;
-      backdrop-filter: blur(16px);
-      background: rgba(6, 16, 28, 0.80);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(14px);
+      background: rgba(7, 17, 31, 0.78);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
     }
 
     .nav-inner {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      align-items: center;
+      gap: 20px;
       padding: 16px 0;
     }
 
     .brand {
       font-size: 22px;
       font-weight: 800;
-      letter-spacing: -0.3px;
-      white-space: nowrap;
+      letter-spacing: -0.4px;
     }
 
-    .brand span {
-      color: var(--accent);
-    }
+    .brand span { color: var(--accent); }
 
     .nav-links {
       display: flex;
-      align-items: center;
       gap: 18px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .nav-links a {
       color: var(--muted);
       font-size: 14px;
-      transition: 0.2s ease;
     }
 
-    .nav-links a:hover {
-      color: var(--text);
-    }
+    .nav-links a:hover { color: var(--text); }
 
     .btn {
       display: inline-flex;
@@ -123,14 +109,11 @@
       gap: 8px;
       border-radius: 14px;
       padding: 12px 16px;
+      border: 1px solid transparent;
+      cursor: pointer;
       font-weight: 700;
       font-size: 14px;
-      line-height: 1;
       transition: 0.2s ease;
-      cursor: pointer;
-      border: 1px solid transparent;
-      background: none;
-      color: inherit;
     }
 
     .btn-primary {
@@ -139,29 +122,24 @@
       box-shadow: var(--shadow);
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
+    .btn-primary:hover { transform: translateY(-1px); }
 
     .btn-secondary {
       color: var(--text);
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255,255,255,0.04);
       border-color: var(--border);
     }
 
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.07);
-    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.07); }
 
     .hero {
-      padding: 76px 0 48px;
+      padding: 72px 0 40px;
     }
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      gap: 34px;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 32px;
       align-items: center;
     }
 
@@ -180,14 +158,14 @@
 
     h1 {
       margin: 0 0 18px;
-      font-size: clamp(40px, 6vw, 72px);
+      font-size: clamp(40px, 6vw, 70px);
       line-height: 1.02;
-      letter-spacing: -1.5px;
+      letter-spacing: -1.4px;
     }
 
     .hero-copy p {
       margin: 0 0 26px;
-      max-width: 680px;
+      max-width: 700px;
       color: var(--muted);
       font-size: 19px;
       line-height: 1.75;
@@ -195,9 +173,9 @@
 
     .hero-actions {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     .hero-note {
@@ -208,10 +186,10 @@
     .hero-card {
       position: relative;
       overflow: hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
       box-shadow: var(--shadow);
     }
 
@@ -222,18 +200,18 @@
       bottom: -40px;
       width: 180px;
       height: 180px;
-      background: radial-gradient(circle, rgba(125, 211, 252, 0.16), transparent 65%);
+      background: radial-gradient(circle, rgba(125,211,252,0.16), transparent 65%);
       pointer-events: none;
     }
 
     .radar {
       position: relative;
-      height: 320px;
+      height: 300px;
       overflow: hidden;
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.08);
       background:
-        radial-gradient(circle at center, rgba(125, 211, 252, 0.08), transparent 55%),
+        radial-gradient(circle at center, rgba(125,211,252,0.08), transparent 55%),
         linear-gradient(180deg, #071220, #0b1828);
       margin-bottom: 18px;
     }
@@ -254,7 +232,7 @@
       top: 50%;
       transform: translate(-50%, -50%);
       border-radius: 50%;
-      border: 1px solid rgba(125, 211, 252, 0.14);
+      border: 1px solid rgba(125,211,252,0.14);
     }
 
     .ring-1 { width: 96px; height: 96px; }
@@ -271,10 +249,10 @@
       border-radius: 50%;
       background: conic-gradient(
         from 280deg,
-        rgba(125, 211, 252, 0) 0deg,
-        rgba(125, 211, 252, 0.03) 250deg,
-        rgba(125, 211, 252, 0.34) 315deg,
-        rgba(125, 211, 252, 0) 360deg
+        rgba(125,211,252,0) 0deg,
+        rgba(125,211,252,0.03) 250deg,
+        rgba(125,211,252,0.34) 315deg,
+        rgba(125,211,252,0) 360deg
       );
       animation: rotate 8s linear infinite;
       filter: blur(1px);
@@ -286,7 +264,7 @@
 
     .cross-x, .cross-y {
       position: absolute;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255,255,255,0.06);
     }
 
     .cross-x {
@@ -305,49 +283,7 @@
       transform: translateX(-50%);
     }
 
-    .track {
-      position: absolute;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      opacity: 0.95;
-    }
-
-    .track.one {
-      width: 180px;
-      top: 112px;
-      left: 78px;
-      transform: rotate(18deg);
-    }
-
-    .track.two {
-      width: 146px;
-      top: 190px;
-      left: 186px;
-      transform: rotate(-26deg);
-    }
-
-    .plane {
-      position: absolute;
-      font-size: 18px;
-      filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.35));
-    }
-
-    .plane.one { top: 101px; left: 214px; transform: rotate(18deg); }
-    .plane.two { top: 178px; left: 255px; transform: rotate(-26deg); }
-
-    .ping {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 8px rgba(125, 211, 252, 0.12);
-    }
-
-    .ping.one { top: 107px; left: 232px; }
-    .ping.two { top: 183px; left: 271px; }
-
-    .card-stats {
+    .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
@@ -371,12 +307,10 @@
       font-size: 13px;
     }
 
-    section {
-      padding: 44px 0;
-    }
+    section { padding: 42px 0; }
 
     .section-head {
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
 
     .section-title {
@@ -409,18 +343,18 @@
       margin-bottom: 14px;
     }
 
-    .map-badges {
+    .badges {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       align-items: center;
     }
 
-    .map-badge {
+    .badge {
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(125, 211, 252, 0.08);
-      border: 1px solid rgba(125, 211, 252, 0.16);
+      background: rgba(125,211,252,0.08);
+      border: 1px solid rgba(125,211,252,0.16);
       color: var(--accent);
       font-size: 13px;
       font-weight: 600;
@@ -433,26 +367,27 @@
 
     .controls-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      grid-template-columns: 1.15fr 1fr;
       gap: 14px;
       margin-bottom: 14px;
     }
 
-    .control-card {
+    .control-card,
+    .panel-card {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 14px;
     }
 
-    .control-title {
-      font-size: 14px;
+    .control-title,
+    .panel-title {
+      font-size: 15px;
       font-weight: 700;
       margin-bottom: 10px;
     }
 
-    .filter-bar,
-    .region-bar {
+    .chip-bar {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
@@ -470,19 +405,19 @@
     }
 
     .toggle-btn.active {
-      background: rgba(125, 211, 252, 0.12);
-      border-color: rgba(125, 211, 252, 0.22);
+      background: rgba(125,211,252,0.12);
+      border-color: rgba(125,211,252,0.22);
       color: var(--accent);
     }
 
-    .watchlist-input-row {
+    .watch-row {
       display: grid;
       grid-template-columns: 1fr auto auto;
       gap: 10px;
       align-items: center;
     }
 
-    .watchlist-input {
+    .watch-input {
       width: 100%;
       padding: 11px 12px;
       border-radius: 12px;
@@ -492,7 +427,7 @@
       outline: none;
     }
 
-    .watchlist-tags {
+    .watch-tags {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
@@ -505,9 +440,9 @@
       gap: 8px;
       padding: 8px 10px;
       border-radius: 999px;
-      background: rgba(134, 239, 172, 0.08);
-      border: 1px solid rgba(134, 239, 172, 0.18);
-      color: var(--success-2);
+      background: rgba(134,239,172,0.08);
+      border: 1px solid rgba(134,239,172,0.18);
+      color: #dcfce7;
       font-size: 12px;
       font-weight: 700;
     }
@@ -533,6 +468,7 @@
       border-radius: 18px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.08);
+      background: #0b1728;
     }
 
     .side-panel {
@@ -540,27 +476,13 @@
       gap: 16px;
     }
 
-    .panel-card {
-      background: var(--panel-2);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .panel-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
     .panel-sub {
       color: var(--muted);
       font-size: 13px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    .flight-list,
-    .alert-list {
+    .list {
       display: grid;
       gap: 10px;
       max-height: 280px;
@@ -568,47 +490,38 @@
       padding-right: 4px;
     }
 
-    .flight-item,
-    .alert-item {
+    .item {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px;
       padding: 12px;
+    }
+
+    .item.flight {
+      cursor: pointer;
       transition: 0.2s ease;
     }
 
-    .flight-item {
-      cursor: pointer;
-    }
-
-    .flight-item:hover {
+    .item.flight:hover {
       background: rgba(255,255,255,0.06);
     }
 
-    .flight-item.military,
-    .alert-item.military {
-      border-color: rgba(252, 165, 165, 0.22);
-      background: rgba(252, 165, 165, 0.06);
+    .item.military {
+      border-color: rgba(252,165,165,0.22);
+      background: rgba(252,165,165,0.06);
     }
 
-    .flight-item.watch,
-    .alert-item.watch {
-      border-color: rgba(134, 239, 172, 0.22);
-      background: rgba(134, 239, 172, 0.07);
+    .item.watch {
+      border-color: rgba(134,239,172,0.22);
+      background: rgba(134,239,172,0.07);
     }
 
-    .alert-item.warning {
-      border-color: rgba(252, 211, 77, 0.22);
-      background: rgba(252, 211, 77, 0.07);
+    .item.warning {
+      border-color: rgba(252,211,77,0.22);
+      background: rgba(252,211,77,0.07);
     }
 
-    .alert-item.success {
-      border-color: rgba(134, 239, 172, 0.22);
-      background: rgba(134, 239, 172, 0.07);
-    }
-
-    .flight-top,
-    .alert-top {
+    .item-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -616,14 +529,12 @@
       margin-bottom: 6px;
     }
 
-    .flight-callsign,
-    .alert-title {
+    .item-title {
       font-weight: 700;
       font-size: 14px;
     }
 
-    .flight-tag,
-    .alert-tag {
+    .tag {
       font-size: 11px;
       padding: 4px 8px;
       border-radius: 999px;
@@ -632,40 +543,37 @@
       white-space: nowrap;
     }
 
-    .flight-tag.military,
-    .alert-tag.military {
-      color: var(--danger-2);
-      border-color: rgba(252, 165, 165, 0.22);
-      background: rgba(252, 165, 165, 0.08);
+    .tag.military {
+      color: #fecaca;
+      border-color: rgba(252,165,165,0.22);
+      background: rgba(252,165,165,0.08);
     }
 
-    .flight-tag.watch,
-    .alert-tag.watch {
-      color: var(--success-2);
-      border-color: rgba(134, 239, 172, 0.22);
-      background: rgba(134, 239, 172, 0.08);
+    .tag.watch {
+      color: #dcfce7;
+      border-color: rgba(134,239,172,0.22);
+      background: rgba(134,239,172,0.08);
     }
 
-    .alert-tag.warning {
+    .tag.warning {
       color: var(--warning);
-      border-color: rgba(252, 211, 77, 0.22);
-      background: rgba(252, 211, 77, 0.08);
+      border-color: rgba(252,211,77,0.22);
+      background: rgba(252,211,77,0.08);
     }
 
-    .alert-tag.success {
+    .tag.new {
       color: var(--success);
-      border-color: rgba(134, 239, 172, 0.22);
-      background: rgba(134, 239, 172, 0.08);
+      border-color: rgba(134,239,172,0.22);
+      background: rgba(134,239,172,0.08);
     }
 
-    .flight-meta,
-    .alert-meta {
+    .item-meta {
       color: var(--muted);
       font-size: 13px;
       line-height: 1.55;
     }
 
-    .grid-3 {
+    .cards {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
@@ -673,7 +581,7 @@
 
     .card {
       padding: 22px;
-      border-radius: var(--radius);
+      border-radius: 22px;
       background: var(--panel);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
@@ -749,27 +657,16 @@
     }
 
     @media (max-width: 1180px) {
-      .controls-grid {
-        grid-template-columns: 1fr;
-      }
+      .controls-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 1120px) {
-      .map-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .flight-list,
-      .alert-list {
-        max-height: 260px;
-      }
+      .map-grid { grid-template-columns: 1fr; }
+      .list { max-height: 260px; }
     }
 
     @media (max-width: 980px) {
-      .hero-grid,
-      .grid-3 {
-        grid-template-columns: 1fr;
-      }
+      .hero-grid, .cards { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 760px) {
@@ -778,29 +675,17 @@
         align-items: flex-start;
       }
 
-      .nav-links {
-        gap: 14px;
-      }
-
-      .card-stats {
+      .stats {
         grid-template-columns: 1fr 1fr;
       }
 
-      .section-title {
-        font-size: 28px;
-      }
-
-      h1 {
-        font-size: 42px;
-      }
-
-      .watchlist-input-row {
+      .watch-row {
         grid-template-columns: 1fr;
       }
 
-      #mapContainer {
-        height: 460px;
-      }
+      .section-title { font-size: 28px; }
+      h1 { font-size: 42px; }
+      #mapContainer { height: 460px; }
     }
   </style>
 </head>
@@ -816,18 +701,18 @@
     </div>
   </nav>
 
-  <header class="hero" id="top">
+  <header class="hero">
     <div class="container hero-grid">
       <div class="hero-copy">
-        <div class="eyebrow">Live OpenSky integration + alerts + watchlists</div>
+        <div class="eyebrow">OSINT air activity monitor</div>
         <h1>Track aircraft activity with real data.</h1>
         <p>
-          SpyAir now loads real aircraft positions, highlights military-likely traffic,
-          supports watchlists, regional views, and generates live alerts when notable movement appears.
+          SpyAir now combines live air-traffic data, military-likely filtering,
+          watchlists, regional monitoring, and a running alert feed in one interface.
         </p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#map">Open live map</a>
-          <a class="btn btn-secondary" href="#features">See what changed</a>
+          <a class="btn btn-secondary" href="#features">See features</a>
         </div>
         <div class="hero-note">
           Real API • military-likely filter • watchlists • regions • live alerts
@@ -843,15 +728,9 @@
           <div class="sweep"></div>
           <div class="cross-x"></div>
           <div class="cross-y"></div>
-          <div class="track one"></div>
-          <div class="track two"></div>
-          <div class="ping one"></div>
-          <div class="ping two"></div>
-          <div class="plane one">✈️</div>
-          <div class="plane two">✈️</div>
         </div>
 
-        <div class="card-stats">
+        <div class="stats">
           <div class="stat">
             <strong id="aircraftCount">0</strong>
             <span>Visible aircraft</span>
@@ -878,16 +757,17 @@
       <div class="section-head">
         <h2 class="section-title">Live aircraft map</h2>
         <p class="section-subtitle">
-          Real aircraft state vectors with military-likely filtering, watchlists, regional monitoring, and alerts.
+          Regional live tracking with military-likely filtering, watchlists, and alerts.
         </p>
       </div>
 
       <div class="map-shell">
         <div class="map-topbar">
-          <div class="map-badges">
-            <div class="map-badge">OpenSky API</div>
-            <div class="map-badge">Auto refresh</div>
-            <div class="map-badge" id="regionBadge">Region: Poland</div>
+          <div class="badges">
+            <div class="badge">Worker API</div>
+            <div class="badge">Auto refresh</div>
+            <div class="badge" id="regionBadge">Region: Poland</div>
+            <div class="badge" id="modeBadge">Mode: Live</div>
           </div>
           <div class="status" id="mapStatus">Loading live data…</div>
         </div>
@@ -895,16 +775,16 @@
         <div class="controls-grid">
           <div class="control-card">
             <div class="control-title">Traffic filters</div>
-            <div class="filter-bar">
+            <div class="chip-bar">
               <button class="toggle-btn active" id="showAllBtn" type="button">All aircraft</button>
               <button class="toggle-btn" id="showMilitaryBtn" type="button">Military-likely only</button>
-              <button class="toggle-btn" id="showWatchBtn" type="button">Watchlist hits only</button>
+              <button class="toggle-btn" id="showWatchBtn" type="button">Watchlist only</button>
             </div>
           </div>
 
           <div class="control-card">
             <div class="control-title">Regions</div>
-            <div class="region-bar">
+            <div class="chip-bar">
               <button class="toggle-btn active region-btn" data-region="poland" type="button">Poland</button>
               <button class="toggle-btn region-btn" data-region="baltics" type="button">Baltics</button>
               <button class="toggle-btn region-btn" data-region="blacksea" type="button">Black Sea</button>
@@ -915,12 +795,12 @@
 
         <div class="control-card" style="margin-bottom:14px;">
           <div class="control-title">Watchlist</div>
-          <div class="watchlist-input-row">
-            <input id="watchInput" class="watchlist-input" type="text" placeholder="Add callsign prefix, e.g. RCH, FORTE, NATO" />
+          <div class="watch-row">
+            <input id="watchInput" class="watch-input" type="text" placeholder="Add callsign prefix, e.g. RCH, FORTE, NATO" />
             <button id="addWatchBtn" class="btn btn-primary" type="button">Add</button>
             <button id="clearWatchBtn" class="btn btn-secondary" type="button">Clear all</button>
           </div>
-          <div class="watchlist-tags" id="watchTags"></div>
+          <div class="watch-tags" id="watchTags"></div>
         </div>
 
         <div class="map-grid">
@@ -929,17 +809,17 @@
           <aside class="side-panel">
             <div class="panel-card">
               <div class="panel-title">Live alerts</div>
-              <div class="panel-sub" id="alertSubtitle">Watching for military-likely activity…</div>
+              <div class="panel-sub" id="alertSubtitle">Watching for activity…</div>
               <div style="margin-bottom:10px;">
                 <button id="exportAlertsBtn" class="btn btn-secondary" type="button">Export alerts</button>
               </div>
-              <div class="alert-list" id="alertList"></div>
+              <div class="list" id="alertList"></div>
             </div>
 
             <div class="panel-card">
               <div class="panel-title">Active flights</div>
               <div class="panel-sub" id="panelSubtitle">Loading current aircraft…</div>
-              <div class="flight-list" id="flightList"></div>
+              <div class="list" id="flightList"></div>
             </div>
           </aside>
         </div>
@@ -950,26 +830,26 @@
   <section id="features">
     <div class="container">
       <div class="section-head">
-        <h2 class="section-title">What changed in this version</h2>
+        <h2 class="section-title">What this version does well</h2>
         <p class="section-subtitle">
-          This is now much closer to an actual OSINT monitoring dashboard.
+          It now behaves like a proper live monitoring prototype instead of a half-loaded page.
         </p>
       </div>
 
-      <div class="grid-3">
+      <div class="cards">
         <div class="card">
-          <div class="icon">📍</div>
-          <h3>Regional views</h3>
+          <div class="icon">🛰️</div>
+          <h3>Live + fallback mode</h3>
           <p>
-            Switch between Poland, Baltics, Black Sea, and Central Europe without rewriting code.
+            If the upstream feed fails, SpyAir falls back to demo data instead of looking broken.
           </p>
         </div>
 
         <div class="card">
           <div class="icon">✅</div>
-          <h3>Watchlist logic</h3>
+          <h3>Watchlists and filters</h3>
           <p>
-            Add callsign prefixes like RCH, FORTE, NATO, or ASCOT and highlight matching flights automatically.
+            Add your own callsign prefixes and isolate military-likely or watchlist traffic instantly.
           </p>
         </div>
 
@@ -977,7 +857,7 @@
           <div class="icon">🚨</div>
           <h3>Useful alert feed</h3>
           <p>
-            New flights, watchlist hits, military-likely entries, and disappearances now appear in a running activity log.
+            New flights, watchlist hits, entries into region, and disappearances show up in the live alert panel.
           </p>
         </div>
       </div>
@@ -989,22 +869,22 @@
       <div class="section-head">
         <h2 class="section-title">Important notes</h2>
         <p class="section-subtitle">
-          This version is strong for prototyping, but still heuristic-based.
+          This version is solid for prototyping, but still heuristic-based.
         </p>
       </div>
 
       <div class="faq">
         <div class="faq-item">
           <strong>Is this a precise military detector?</strong>
-          <span>No. It uses first-pass rules, watchlist patterns, and movement context. It is useful for spotting likely activity, not as a final ground-truth classifier.</span>
+          <span>No. It is a first-pass classifier based on callsign patterns and watchlist logic.</span>
         </div>
         <div class="faq-item">
-          <strong>What should come next after this?</strong>
-          <span>The next real milestone is moving API calls behind a backend or Cloudflare Worker, then adding historical storage, better watchlists, and persistent alerts.</span>
+          <strong>Why does fallback mode exist?</strong>
+          <span>Because live upstream feeds can fail. Fallback prevents the UI from looking dead while you keep building.</span>
         </div>
         <div class="faq-item">
-          <strong>Why is this already valuable?</strong>
-          <span>Because you now have live data, filtering, regional switching, watchlists, and an event log in one working interface.</span>
+          <strong>What should come next?</strong>
+          <span>Server-side filtering, persistent history, stronger watchlists, and backend alerting.</span>
         </div>
       </div>
     </div>
@@ -1013,7 +893,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div>© 2026 SpyAir</div>
-      <div>Live aircraft tracking prototype</div>
+      <div>OSINT air activity monitor</div>
     </div>
   </footer>
 
@@ -1024,20 +904,70 @@
   ></script>
 
   <script>
-    const map = L.map("mapContainer", {
-      zoomControl: true
-    }).setView([52.1, 19.4], 6);
+    const API_BASE = "https://spyair-api.mlodykawa.workers.dev";
+
+    const DEMO_FLIGHTS = [
+      { icao24: "demo01", callsign: "RCH102", originCountry: "United States", latitude: 52.21, longitude: 21.01, baroAltitude: 9400, velocity: 225, trueTrack: 110, militaryLikely: true, watchHit: true },
+      { icao24: "demo02", callsign: "FORTE12", originCountry: "United States", latitude: 54.55, longitude: 18.52, baroAltitude: 15100, velocity: 180, trueTrack: 70, militaryLikely: true, watchHit: true },
+      { icao24: "demo03", callsign: "LOT381", originCountry: "Poland", latitude: 50.07, longitude: 19.95, baroAltitude: 10100, velocity: 205, trueTrack: 260, militaryLikely: false, watchHit: false },
+      { icao24: "demo04", callsign: "NATO42", originCountry: "Belgium", latitude: 53.40, longitude: 14.55, baroAltitude: 11600, velocity: 212, trueTrack: 35, militaryLikely: true, watchHit: true },
+      { icao24: "demo05", callsign: "DLH7AB", originCountry: "Germany", latitude: 51.76, longitude: 19.46, baroAltitude: 8800, velocity: 190, trueTrack: 190, militaryLikely: false, watchHit: false }
+    ];
+
+    const regionConfigs = {
+      poland: {
+        label: "Poland",
+        bounds: { lamin: 49.0, lamax: 55.0, lomin: 14.0, lomax: 24.5 },
+        center: [52.1, 19.4],
+        zoom: 6,
+        focusBox: { minLat: 49.0, maxLat: 54.9, minLon: 14.0, maxLon: 24.5 }
+      },
+      baltics: {
+        label: "Baltics",
+        bounds: { lamin: 54.0, lamax: 59.8, lomin: 19.0, lomax: 29.5 },
+        center: [56.2, 24.7],
+        zoom: 6,
+        focusBox: { minLat: 54.0, maxLat: 59.8, minLon: 19.0, maxLon: 29.5 }
+      },
+      blacksea: {
+        label: "Black Sea",
+        bounds: { lamin: 40.0, lamax: 47.8, lomin: 27.0, lomax: 42.5 },
+        center: [43.2, 34.6],
+        zoom: 6,
+        focusBox: { minLat: 40.0, maxLat: 47.8, minLon: 27.0, maxLon: 42.5 }
+      },
+      central: {
+        label: "Central Europe",
+        bounds: { lamin: 47.0, lamax: 56.8, lomin: 8.0, lomax: 26.0 },
+        center: [51.2, 17.2],
+        zoom: 5,
+        focusBox: { minLat: 47.0, maxLat: 56.8, minLon: 8.0, maxLon: 26.0 }
+      }
+    };
+
+    const militaryPrefixes = [
+      "RCH", "RRR", "MMF", "NATO", "BAF", "QID", "CNV", "HKY", "ASY",
+      "AME", "SHEP", "DUKE", "LAGR", "BRK", "REDEYE", "FORTE", "JAKE",
+      "NAVY", "VM", "MC", "RAFAIR", "PACK", "MOOSE", "GAF", "IAF", "CTM",
+      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM"
+    ];
+
+    const map = L.map("mapContainer", { zoomControl: true }).setView([52.1, 19.4], 6);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
+    const markersLayer = L.layerGroup().addTo(map);
+
     const mapStatus = document.getElementById("mapStatus");
+    const regionBadge = document.getElementById("regionBadge");
+    const modeBadge = document.getElementById("modeBadge");
+
     const aircraftCount = document.getElementById("aircraftCount");
     const militaryCount = document.getElementById("militaryCount");
     const watchCount = document.getElementById("watchCount");
     const alertCount = document.getElementById("alertCount");
-    const regionBadge = document.getElementById("regionBadge");
 
     const flightList = document.getElementById("flightList");
     const alertList = document.getElementById("alertList");
@@ -1055,54 +985,14 @@
     const watchTags = document.getElementById("watchTags");
     const exportAlertsBtn = document.getElementById("exportAlertsBtn");
 
-    const markersLayer = L.layerGroup().addTo(map);
-
-    const regionConfigs = {
-      poland: {
-        label: "Poland",
-        bounds: { lamin: 49.0, lamax: 55.0, lomin: 14.0, lomax: 24.5 },
-        center: [52.1, 19.4],
-        zoom: 6,
-        focusCountryBox: { minLat: 49.0, maxLat: 54.9, minLon: 14.0, maxLon: 24.5 }
-      },
-      baltics: {
-        label: "Baltics",
-        bounds: { lamin: 54.0, lamax: 59.8, lomin: 19.0, lomax: 29.5 },
-        center: [56.2, 24.7],
-        zoom: 6,
-        focusCountryBox: { minLat: 54.0, maxLat: 59.8, minLon: 19.0, maxLon: 29.5 }
-      },
-      blacksea: {
-        label: "Black Sea",
-        bounds: { lamin: 40.0, lamax: 47.8, lomin: 27.0, lomax: 42.5 },
-        center: [43.2, 34.6],
-        zoom: 6,
-        focusCountryBox: { minLat: 40.0, maxLat: 47.8, minLon: 27.0, maxLon: 42.5 }
-      },
-      central: {
-        label: "Central Europe",
-        bounds: { lamin: 47.0, lamax: 56.8, lomin: 8.0, lomax: 26.0 },
-        center: [51.2, 17.2],
-        zoom: 5,
-        focusCountryBox: { minLat: 47.0, maxLat: 56.8, minLon: 8.0, maxLon: 26.0 }
-      }
-    };
-
-    const militaryPrefixes = [
-      "RCH", "RRR", "MMF", "NATO", "BAF", "QID", "CNV", "HKY", "ASY",
-      "AME", "SHEP", "DUKE", "LAGR", "BRK", "REDEYE", "FORTE", "JAKE",
-      "NAVY", "VM", "MC", "RAFAIR", "PACK", "MOOSE", "GAF", "IAF", "CTM",
-      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM",
-      "TARTN", "GRIM", "PITOT", "NCHO", "HOMER", "LOON", "BART"
-    ];
-
     let currentFilter = "all";
     let currentRegion = "poland";
     let currentFlights = [];
-    let markerMap = new Map();
     let previousFlights = new Map();
     let alerts = [];
+    let markerMap = new Map();
     let watchlist = loadWatchlist();
+    let usingFallback = false;
 
     const allIcon = L.divIcon({
       html: '<div style="font-size:18px; color:#7dd3fc;">✈️</div>',
@@ -1132,6 +1022,11 @@
         .replaceAll(">", "&gt;");
     }
 
+    function shortValue(value, fallback = "Unknown") {
+      const text = String(value || "").trim();
+      return text || fallback;
+    }
+
     function formatAlt(meters) {
       if (meters === null || meters === undefined) return "Unknown";
       return Math.round(meters * 3.28084).toLocaleString() + " ft";
@@ -1142,23 +1037,13 @@
       return Math.round(ms * 1.94384) + " kt";
     }
 
-    function shortValue(value, fallback = "Unknown") {
-      const text = String(value || "").trim();
-      return text || fallback;
-    }
-
     function currentFocusBox() {
-      return regionConfigs[currentRegion].focusCountryBox;
+      return regionConfigs[currentRegion].focusBox;
     }
 
     function isInsideFocus(lat, lon) {
       const box = currentFocusBox();
-      return (
-        lat >= box.minLat &&
-        lat <= box.maxLat &&
-        lon >= box.minLon &&
-        lon <= box.maxLon
-      );
+      return lat >= box.minLat && lat <= box.maxLat && lon >= box.minLon && lon <= box.maxLon;
     }
 
     function isMilitaryLikely(callsign, country) {
@@ -1166,25 +1051,13 @@
       const c = String(country || "").trim().toUpperCase();
 
       if (!cs) return false;
-
-      if (militaryPrefixes.some(prefix => cs.startsWith(prefix))) {
-        return true;
-      }
-
-      if (/^\d{2,}$/.test(cs)) {
-        return false;
-      }
-
-      if (cs.includes("AF") && cs.length <= 8) {
-        return true;
-      }
-
+      if (militaryPrefixes.some(prefix => cs.startsWith(prefix))) return true;
+      if (/^\d{2,}$/.test(cs)) return false;
+      if (cs.includes("AF") && cs.length <= 8) return true;
       if (
         ["UNITED STATES", "UNITED KINGDOM", "FRANCE", "GERMANY", "ITALY", "POLAND"].includes(c) &&
         /^[A-Z]{2,6}\d{1,4}$/.test(cs)
-      ) {
-        return true;
-      }
+      ) return true;
 
       return false;
     }
@@ -1195,31 +1068,23 @@
       return watchlist.some(prefix => cs.startsWith(prefix));
     }
 
-    function normalizeFlight(s) {
-      const icao24 = s[0];
-      const callsign = (s[1] || "").trim();
-      const originCountry = s[2] || "Unknown";
-      const longitude = s[5];
-      const latitude = s[6];
-      const baroAltitude = s[7];
-      const velocity = s[9];
-      const trueTrack = s[10];
-      const onGround = s[8];
-
-      return {
-        icao24,
-        callsign: callsign || "Unknown",
-        originCountry,
-        longitude,
-        latitude,
-        baroAltitude,
-        velocity,
-        trueTrack,
-        onGround,
-        militaryLikely: isMilitaryLikely(callsign, originCountry),
-        insideFocus: isInsideFocus(latitude, longitude),
-        watchHit: isWatchlistHit(callsign)
+    function normalizeFlight(raw) {
+      const flight = {
+        icao24: raw.icao24,
+        callsign: raw.callsign || "Unknown",
+        originCountry: raw.originCountry || "Unknown",
+        latitude: raw.latitude,
+        longitude: raw.longitude,
+        baroAltitude: raw.baroAltitude ?? null,
+        velocity: raw.velocity ?? null,
+        trueTrack: raw.trueTrack ?? null
       };
+
+      flight.militaryLikely = isMilitaryLikely(flight.callsign, flight.originCountry);
+      flight.watchHit = isWatchlistHit(flight.callsign);
+      flight.insideFocus = isInsideFocus(flight.latitude, flight.longitude);
+
+      return flight;
     }
 
     function sortFlights(flights) {
@@ -1246,53 +1111,52 @@
       alertList.innerHTML = "";
 
       if (!alerts.length) {
-        alertList.innerHTML = '<div class="alert-meta">No alerts yet.</div>';
+        alertList.innerHTML = '<div class="item-meta">No alerts yet.</div>';
         alertCount.textContent = "0";
         return;
       }
 
-      alerts.forEach((alert) => {
+      for (const alert of alerts) {
         const item = document.createElement("div");
-        let cls = "alert-item";
-        let tagCls = "alert-tag";
+        let cls = "item";
+        let tagCls = "tag";
         let tagText = "event";
 
         if (alert.type === "military") {
           cls += " military";
           tagCls += " military";
           tagText = "military";
-        } else if (alert.type === "warning") {
-          cls += " warning";
-          tagCls += " warning";
-          tagText = "warning";
-        } else if (alert.type === "success") {
-          cls += " success";
-          tagCls += " success";
-          tagText = "new";
         } else if (alert.type === "watch") {
           cls += " watch";
           tagCls += " watch";
           tagText = "watch";
+        } else if (alert.type === "warning") {
+          cls += " warning";
+          tagCls += " warning";
+          tagText = "warning";
+        } else if (alert.type === "new") {
+          tagCls += " new";
+          tagText = "new";
         }
 
         item.className = cls;
         item.innerHTML = `
-          <div class="alert-top">
-            <div class="alert-title">${escapeHtml(alert.title)}</div>
+          <div class="item-top">
+            <div class="item-title">${escapeHtml(alert.title)}</div>
             <div class="${tagCls}">${escapeHtml(tagText)}</div>
           </div>
-          <div class="alert-meta">
+          <div class="item-meta">
             ${escapeHtml(alert.text)}<br />
             ${escapeHtml(alert.time)}
           </div>
         `;
         alertList.appendChild(item);
-      });
+      }
 
       alertCount.textContent = alerts.length.toLocaleString();
     }
 
-    function getMarkerIcon(flight) {
+    function markerIconFor(flight) {
       if (flight.watchHit) return watchIcon;
       if (flight.militaryLikely) return militaryIcon;
       return allIcon;
@@ -1302,11 +1166,10 @@
       markersLayer.clearLayers();
       markerMap.clear();
 
-      flights.forEach((flight) => {
-        const marker = L.marker(
-          [flight.latitude, flight.longitude],
-          { icon: getMarkerIcon(flight) }
-        );
+      for (const flight of flights) {
+        const marker = L.marker([flight.latitude, flight.longitude], {
+          icon: markerIconFor(flight)
+        });
 
         marker.bindPopup(`
           <div>
@@ -1323,40 +1186,40 @@
 
         marker.addTo(markersLayer);
         markerMap.set(flight.icao24, marker);
-      });
+      }
     }
 
-    function renderList(flights) {
+    function renderFlightList(flights) {
       flightList.innerHTML = "";
 
       if (!flights.length) {
-        flightList.innerHTML = '<div class="flight-meta">No aircraft match the current filter.</div>';
+        flightList.innerHTML = '<div class="item-meta">No aircraft match the current filter.</div>';
         return;
       }
 
       flights.slice(0, 100).forEach((flight) => {
         const item = document.createElement("div");
-        let cls = "flight-item";
-        if (flight.watchHit) cls += " watch";
-        else if (flight.militaryLikely) cls += " military";
-        item.className = cls;
-
-        let tagClass = "flight-tag";
+        let cls = "item flight";
+        let tagCls = "tag";
         let tagText = "general";
+
         if (flight.watchHit) {
-          tagClass += " watch";
+          cls += " watch";
+          tagCls += " watch";
           tagText = "watch";
         } else if (flight.militaryLikely) {
-          tagClass += " military";
+          cls += " military";
+          tagCls += " military";
           tagText = "military";
         }
 
+        item.className = cls;
         item.innerHTML = `
-          <div class="flight-top">
-            <div class="flight-callsign">${escapeHtml(shortValue(flight.callsign))}</div>
-            <div class="${tagClass}">${escapeHtml(tagText)}</div>
+          <div class="item-top">
+            <div class="item-title">${escapeHtml(shortValue(flight.callsign))}</div>
+            <div class="${tagCls}">${escapeHtml(tagText)}</div>
           </div>
-          <div class="flight-meta">
+          <div class="item-meta">
             ${escapeHtml(shortValue(flight.originCountry))}<br />
             ${escapeHtml(formatAlt(flight.baroAltitude))} • ${escapeHtml(formatSpeed(flight.velocity))}<br />
             ${flight.insideFocus ? "Inside focus region" : "Outside focus region"}
@@ -1385,7 +1248,7 @@
       }
 
       renderMarkers(filtered);
-      renderList(filtered);
+      renderFlightList(filtered);
 
       aircraftCount.textContent = filtered.length.toLocaleString();
       militaryCount.textContent = currentFlights.filter(f => f.militaryLikely).length.toLocaleString();
@@ -1407,58 +1270,32 @@
         const prev = previousFlights.get(flight.icao24);
 
         if (!prev && flight.watchHit) {
-          addAlert(
-            "Watchlist hit appeared",
-            `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`,
-            "watch"
-          );
-        }
-
-        if (!prev && flight.militaryLikely && !flight.watchHit) {
-          addAlert(
-            "New military-likely flight",
-            `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`,
-            "success"
-          );
+          addAlert("Watchlist hit appeared", `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`, "watch");
+        } else if (!prev && flight.militaryLikely) {
+          addAlert("New military-likely flight", `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`, "new");
         }
 
         if (prev && !prev.insideFocus && flight.insideFocus && flight.militaryLikely) {
-          addAlert(
-            "Military-likely entered focus region",
-            `${flight.callsign} moved into ${regionConfigs[currentRegion].label}.`,
-            "military"
-          );
+          addAlert("Military-likely entered focus region", `${flight.callsign} moved into ${regionConfigs[currentRegion].label}.`, "military");
         }
 
         if (prev && !prev.watchHit && flight.watchHit) {
-          addAlert(
-            "Watchlist matched",
-            `${flight.callsign} now matches your watchlist.`,
-            "watch"
-          );
+          addAlert("Watchlist matched", `${flight.callsign} now matches your watchlist.`, "watch");
         }
       }
 
       for (const [icao24, prev] of previousFlights.entries()) {
         if (!nextMap.has(icao24) && prev.watchHit) {
-          addAlert(
-            "Watchlist flight disappeared",
-            `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`,
-            "warning"
-          );
+          addAlert("Watchlist flight disappeared", `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`, "warning");
         } else if (!nextMap.has(icao24) && prev.militaryLikely) {
-          addAlert(
-            "Military-likely disappeared",
-            `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`,
-            "warning"
-          );
+          addAlert("Military-likely disappeared", `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`, "warning");
         }
       }
 
       previousFlights = nextMap;
       alertSubtitle.textContent = alerts.length
         ? "Recent activity changes detected"
-        : "Watching for military-likely activity…";
+        : "Watching for activity…";
     }
 
     function saveWatchlist() {
@@ -1477,17 +1314,18 @@
 
     function renderWatchlist() {
       watchTags.innerHTML = "";
+
       if (!watchlist.length) {
-        watchTags.innerHTML = '<span class="flight-meta">No watchlist prefixes yet.</span>';
+        watchTags.innerHTML = '<span class="item-meta">No watchlist prefixes yet.</span>';
         return;
       }
 
-      watchlist.forEach((tag) => {
+      for (const tag of watchlist) {
         const el = document.createElement("span");
         el.className = "watch-tag";
         el.innerHTML = `${escapeHtml(tag)} <button type="button" data-tag="${escapeHtml(tag)}">✕</button>`;
         watchTags.appendChild(el);
-      });
+      }
 
       watchTags.querySelectorAll("button").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -1521,39 +1359,68 @@
       map.setView(cfg.center, cfg.zoom);
     }
 
-    async function loadAircraft() {
+    function normalizeFromApiState(state) {
+      return {
+        icao24: state[0],
+        callsign: (state[1] || "").trim() || "Unknown",
+        originCountry: state[2] || "Unknown",
+        longitude: state[5],
+        latitude: state[6],
+        baroAltitude: state[7],
+        velocity: state[9],
+        trueTrack: state[10]
+      };
+    }
+
+    async function fetchFlights() {
       const cfg = regionConfigs[currentRegion];
       const b = cfg.bounds;
-      const url = `https://spyair-api.mlodykawa.workers.dev/api/states?lamin=${b.lamin}&lamax=${b.lamax}&lomin=${b.lomin}&lomax=${b.lomax}`;
+      const url = `${API_BASE}/api/states?lamin=${b.lamin}&lamax=${b.lamax}&lomin=${b.lomin}&lomax=${b.lomax}`;
+
+      const response = await fetch(url);
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Worker returned non-JSON response");
+      }
+
+      if (!response.ok || !data.ok || !Array.isArray(data.states)) {
+        throw new Error(data.error || "No valid state data");
+      }
+
+      return sortFlights(
+        data.states
+          .filter((s) => s && s[5] !== null && s[6] !== null && s[8] === false)
+          .map(normalizeFromApiState)
+          .map(normalizeFlight)
+      );
+    }
+
+    function fallbackFlights() {
+      return sortFlights(DEMO_FLIGHTS.map(normalizeFlight));
+    }
+
+    async function loadAircraft() {
       mapStatus.textContent = "Refreshing live data…";
 
       try {
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        let data;  try {   data = await response.json(); } catch (e) {   console.error("Bad JSON:", e);   return; }  if (!data || !data.states) {   console.warn("No data from API:", data);   return; }
-        const states = Array.isArray(data.states) ? data.states : [];
-
-        const validStates = states.filter((s) =>
-          s &&
-          s[5] !== null &&
-          s[6] !== null &&
-          s[8] === false
-        );
-
-        const normalized = sortFlights(validStates.map(normalizeFlight));
-        detectAlerts(normalized);
-
-        currentFlights = normalized;
+        usingFallback = false;
+        modeBadge.textContent = "Mode: Live";
+        currentFlights = await fetchFlights();
+        detectAlerts(currentFlights);
         applyCurrentFilter();
-
         mapStatus.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
       } catch (error) {
         console.error(error);
-        mapStatus.textContent = "Live data failed to load. Try again in a moment.";
+        usingFallback = true;
+        modeBadge.textContent = "Mode: Fallback";
+        currentFlights = fallbackFlights();
+        detectAlerts(currentFlights);
+        applyCurrentFilter();
+        mapStatus.textContent = "Live feed unavailable — showing fallback demo data.";
       }
     }
 
