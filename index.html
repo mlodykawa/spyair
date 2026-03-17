@@ -4,15 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SpyAir — Live aircraft monitor</title>
-  <meta name="description" content="SpyAir is a live air activity monitor powered by FR24 data, with regional filters, watchlists, and alerts." />
+  <meta
+    name="description"
+    content="SpyAir is a live air activity monitor powered by FR24 data, with regional filters, watchlists, alerts, and smooth motion."
+  />
   <meta name="theme-color" content="#060d16" />
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.js"></script>
 
   <style>
     :root {
@@ -29,7 +28,7 @@
       --warning: #fcd34d;
       --shadow: 0 24px 70px rgba(0,0,0,0.35);
       --radius: 20px;
-      --max: 1400px;
+      --max: 1440px;
     }
 
     * { box-sizing: border-box; }
@@ -87,9 +86,7 @@
       font-size: 14px;
     }
 
-    .nav-links a:hover {
-      color: var(--text);
-    }
+    .nav-links a:hover { color: var(--text); }
 
     .topbar {
       padding: 18px 0 14px;
@@ -109,9 +106,7 @@
       box-shadow: var(--shadow);
     }
 
-    .hero-box {
-      padding: 22px;
-    }
+    .hero-box { padding: 22px; }
 
     .eyebrow {
       display: inline-flex;
@@ -451,24 +446,14 @@
       flex-wrap: wrap;
     }
 
-    .plane-label {
-      color: #dbeafe;
-      font-size: 11px;
-      font-weight: 700;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
-      white-space: nowrap;
-    }
-
-    .leaflet-popup-content-wrapper,
-    .leaflet-popup-tip {
+    .maplibregl-popup-content {
       background: #0b1626;
       color: #f3f7fc;
+      border-radius: 14px;
     }
 
-    .leaflet-popup-content {
-      color: #f3f7fc;
-      line-height: 1.5;
-      min-width: 220px;
+    .maplibregl-popup-tip {
+      border-top-color: #0b1626 !important;
     }
 
     @media (max-width: 1280px) {
@@ -501,7 +486,7 @@
         align-items: flex-start;
       }
 
-      .stats {
+      .stats-box {
         grid-template-columns: 1fr 1fr;
       }
 
@@ -533,11 +518,11 @@
         <div class="eyebrow">FR24-backed live monitor</div>
         <h1>Live air activity, built for signal.</h1>
         <div class="hero-copy">
-          SpyAir now runs on real FR24-fed data and gives you a cleaner workflow for
-          regional monitoring, military-likely spotting, watchlists, and live alerts.
+          SpyAir now runs on real FR24-fed data and uses smooth interpolation between snapshots,
+          map-native rendering, trails, watchlists, and live alerts.
         </div>
         <div class="hero-note">
-          This version changes the interface, not only the data source.
+          This version replaces Leaflet with MapLibre and changes the rendering model.
         </div>
       </div>
 
@@ -633,37 +618,33 @@
     </div>
   </footer>
 
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
-
   <script>
     const API_BASE = "https://spyair-api.mlodykawa.workers.dev";
+    const REFRESH_MS = 20000;
+    const ANIMATION_MS = 18000;
 
     const regionConfigs = {
       poland: {
         label: "Poland",
-        center: [52.1, 19.4],
+        center: [19.4, 52.1],
         zoom: 6,
         focusBox: { minLat: 49.0, maxLat: 54.9, minLon: 14.0, maxLon: 24.5 }
       },
       baltics: {
         label: "Baltics",
-        center: [56.2, 24.7],
+        center: [24.7, 56.2],
         zoom: 6,
         focusBox: { minLat: 54.0, maxLat: 59.8, minLon: 19.0, maxLon: 29.5 }
       },
       blacksea: {
         label: "Black Sea",
-        center: [43.2, 34.6],
+        center: [34.6, 43.2],
         zoom: 6,
         focusBox: { minLat: 40.0, maxLat: 47.8, minLon: 27.0, maxLon: 42.5 }
       },
       central: {
         label: "Central Europe",
-        center: [51.2, 17.2],
+        center: [17.2, 51.2],
         zoom: 5,
         focusBox: { minLat: 47.0, maxLat: 56.8, minLon: 8.0, maxLon: 26.0 }
       }
@@ -676,13 +657,100 @@
       "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM", "PLF"
     ];
 
-    const map = L.map("mapContainer", { zoomControl: true }).setView([52.1, 19.4], 6);
+    const map = new maplibregl.Map({
+      container: "mapContainer",
+      center: regionConfigs.poland.center,
+      zoom: regionConfigs.poland.zoom,
+      pitch: 0,
+      bearing: 0,
+      attributionControl: true,
+      style: {
+        version: 8,
+        glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+        sources: {
+          osm: {
+            type: "raster",
+            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+            tileSize: 256,
+            attribution: "© OpenStreetMap contributors"
+          },
+          flights: {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          },
+          trails: {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          }
+        },
+        layers: [
+          {
+            id: "osm",
+            type: "raster",
+            source: "osm"
+          },
+          {
+            id: "trails",
+            type: "line",
+            source: "trails",
+            paint: {
+              "line-color": [
+                "match",
+                ["get", "category"],
+                "watch", "#86efac",
+                "military", "#fca5a5",
+                "#7dd3fc"
+              ],
+              "line-width": 2,
+              "line-opacity": 0.55
+            }
+          },
+          {
+            id: "planes",
+            type: "symbol",
+            source: "flights",
+            layout: {
+              "text-field": "✈",
+              "text-size": 18,
+              "text-allow-overlap": true,
+              "text-ignore-placement": true,
+              "text-rotate": ["coalesce", ["get", "heading"], 0]
+            },
+            paint: {
+              "text-color": [
+                "match",
+                ["get", "category"],
+                "watch", "#86efac",
+                "military", "#fca5a5",
+                "#7dd3fc"
+              ],
+              "text-halo-color": "#06101c",
+              "text-halo-width": 1.2
+            }
+          },
+          {
+            id: "callsigns",
+            type: "symbol",
+            source: "flights",
+            layout: {
+              "text-field": ["get", "callsign"],
+              "text-size": 11,
+              "text-offset": [0, 1.3],
+              "text-anchor": "top",
+              "text-allow-overlap": true,
+              "text-ignore-placement": true
+            },
+            paint: {
+              "text-color": "#dbeafe",
+              "text-halo-color": "#06101c",
+              "text-halo-width": 1.1
+            }
+          }
+        ]
+      }
+    });
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
-
-    const markersLayer = L.layerGroup().addTo(map);
+    map.addControl(new maplibregl.NavigationControl(), "top-right");
 
     const mapStatus = document.getElementById("mapStatus");
     const regionBadge = document.getElementById("regionBadge");
@@ -711,32 +779,16 @@
 
     let currentFilter = "all";
     let currentRegion = "poland";
-    let currentFlights = [];
-    let previousFlights = new Map();
     let alerts = [];
-    let markerMap = new Map();
     let watchlist = loadWatchlist();
+    let previousFlights = new Map();
 
-    function planeDiv(rotation, color, callsign) {
-      return `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <div style="font-size:18px;line-height:1;color:${color};transform:rotate(${rotation}deg);filter:drop-shadow(0 0 6px rgba(0,0,0,0.8));">✈</div>
-          <div class="plane-label">${callsign}</div>
-        </div>
-      `;
-    }
-
-    function markerIconFor(flight) {
-      const color = flight.watchHit ? "#86efac" : flight.militaryLikely ? "#fca5a5" : "#7dd3fc";
-      const rotation = Number.isFinite(flight.trueTrack) ? flight.trueTrack : 0;
-
-      return L.divIcon({
-        html: planeDiv(rotation, color, flight.callsign),
-        className: "",
-        iconSize: [80, 26],
-        iconAnchor: [16, 13]
-      });
-    }
+    let latestFlights = [];
+    let displayState = new Map();
+    let targetState = new Map();
+    let trails = new Map();
+    let animationStart = performance.now();
+    let popup = null;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -798,12 +850,13 @@
         longitude: raw.lon ?? raw.longitude,
         baroAltitude: raw.altitude ?? raw.baroAltitude ?? null,
         velocity: raw.speed ?? raw.velocity ?? null,
-        trueTrack: raw.heading ?? raw.trueTrack ?? null
+        trueTrack: raw.heading ?? raw.trueTrack ?? 0
       };
 
       flight.militaryLikely = isMilitaryLikely(flight.callsign, flight.originCountry);
       flight.watchHit = isWatchlistHit(flight.callsign);
       flight.insideFocus = isInsideFocus(flight.latitude, flight.longitude);
+      flight.category = flight.watchHit ? "watch" : flight.militaryLikely ? "military" : "general";
 
       return flight;
     }
@@ -877,33 +930,6 @@
       alertCount.textContent = alerts.length.toLocaleString();
     }
 
-    function renderMarkers(flights) {
-      markersLayer.clearLayers();
-      markerMap.clear();
-
-      for (const flight of flights) {
-        const marker = L.marker([flight.latitude, flight.longitude], {
-          icon: markerIconFor(flight)
-        });
-
-        marker.bindPopup(`
-          <div>
-            <strong>${escapeHtml(flight.callsign)}</strong><br />
-            ICAO24: ${escapeHtml(flight.icao24)}<br />
-            Country: ${escapeHtml(flight.originCountry)}<br />
-            Altitude: ${escapeHtml(formatAlt(flight.baroAltitude))}<br />
-            Speed: ${escapeHtml(formatSpeed(flight.velocity))}<br />
-            Track: ${flight.trueTrack !== null && flight.trueTrack !== undefined ? Math.round(flight.trueTrack) + "°" : "Unknown"}<br />
-            Region: ${flight.insideFocus ? "Inside focus region" : "Outside"}<br />
-            Flag: ${flight.watchHit ? "Watchlist hit" : flight.militaryLikely ? "Military-likely" : "General traffic"}
-          </div>
-        `);
-
-        marker.addTo(markersLayer);
-        markerMap.set(flight.icao24, marker);
-      }
-    }
-
     function renderFlightList(flights) {
       flightList.innerHTML = "";
 
@@ -942,11 +968,11 @@
         `;
 
         item.addEventListener("click", () => {
-          const marker = markerMap.get(flight.icao24);
-          if (marker) {
-            map.flyTo([flight.latitude, flight.longitude], 8, { duration: 0.8 });
-            marker.openPopup();
-          }
+          map.flyTo({
+            center: [flight.longitude, flight.latitude],
+            zoom: Math.max(map.getZoom(), 8),
+            speed: 0.8
+          });
         });
 
         flightList.appendChild(item);
@@ -954,7 +980,7 @@
     }
 
     function applyCurrentFilter() {
-      let filtered = currentFlights;
+      let filtered = latestFlights;
 
       if (currentFilter === "military") {
         filtered = filtered.filter(f => f.militaryLikely);
@@ -962,12 +988,9 @@
         filtered = filtered.filter(f => f.watchHit);
       }
 
-      renderMarkers(filtered);
-      renderFlightList(filtered);
-
       aircraftCount.textContent = filtered.length.toLocaleString();
-      militaryCount.textContent = currentFlights.filter(f => f.militaryLikely).length.toLocaleString();
-      watchCount.textContent = currentFlights.filter(f => f.watchHit).length.toLocaleString();
+      militaryCount.textContent = latestFlights.filter(f => f.militaryLikely).length.toLocaleString();
+      watchCount.textContent = latestFlights.filter(f => f.watchHit).length.toLocaleString();
 
       if (currentFilter === "military") {
         panelSubtitle.textContent = "Showing military-likely flights only";
@@ -976,6 +999,8 @@
       } else {
         panelSubtitle.textContent = "Showing all currently visible flights";
       }
+
+      renderFlightList(filtered);
     }
 
     function detectAlerts(newFlights) {
@@ -1048,18 +1073,20 @@
           watchlist = watchlist.filter(v => v !== tag);
           saveWatchlist();
           renderWatchlist();
-          refreshDerivedFlags();
+          latestFlights = latestFlights.map(f => normalizeFlight({
+            id: f.icao24,
+            callsign: f.callsign,
+            country: f.originCountry,
+            lat: f.latitude,
+            lon: f.longitude,
+            altitude: f.baroAltitude,
+            speed: f.velocity,
+            heading: f.trueTrack
+          }));
+          latestFlights = sortFlights(latestFlights);
           applyCurrentFilter();
         });
       });
-    }
-
-    function refreshDerivedFlags() {
-      currentFlights = currentFlights.map(f => ({
-        ...f,
-        watchHit: isWatchlistHit(f.callsign)
-      }));
-      currentFlights = sortFlights(currentFlights);
     }
 
     function normalizeRegionButtons() {
@@ -1067,11 +1094,6 @@
         btn.classList.toggle("active", btn.dataset.region === currentRegion);
       });
       regionBadge.textContent = `Region: ${regionConfigs[currentRegion].label}`;
-    }
-
-    function setMapToRegion() {
-      const cfg = regionConfigs[currentRegion];
-      map.setView(cfg.center, cfg.zoom);
     }
 
     async function fetchFlights() {
@@ -1098,12 +1120,140 @@
       );
     }
 
+    function updateTargets(flights) {
+      const newTargetMap = new Map();
+
+      for (const f of flights) {
+        newTargetMap.set(f.icao24, f);
+
+        const existing = displayState.get(f.icao24);
+        if (!existing) {
+          displayState.set(f.icao24, {
+            ...f,
+            _startLat: f.latitude,
+            _startLon: f.longitude,
+            _targetLat: f.latitude,
+            _targetLon: f.longitude,
+            _startHeading: f.trueTrack || 0,
+            _targetHeading: f.trueTrack || 0
+          });
+        } else {
+          const trail = trails.get(f.icao24) || [];
+          trail.push([existing.longitude, existing.latitude]);
+          trails.set(f.icao24, trail.slice(-12));
+
+          existing._startLat = existing.latitude;
+          existing._startLon = existing.longitude;
+          existing._targetLat = f.latitude;
+          existing._targetLon = f.longitude;
+          existing._startHeading = existing.trueTrack || 0;
+          existing._targetHeading = f.trueTrack || 0;
+
+          existing.callsign = f.callsign;
+          existing.originCountry = f.originCountry;
+          existing.baroAltitude = f.baroAltitude;
+          existing.velocity = f.velocity;
+          existing.militaryLikely = f.militaryLikely;
+          existing.watchHit = f.watchHit;
+          existing.insideFocus = f.insideFocus;
+          existing.category = f.category;
+        }
+      }
+
+      for (const key of [...displayState.keys()]) {
+        if (!newTargetMap.has(key)) {
+          displayState.delete(key);
+          trails.delete(key);
+        }
+      }
+
+      targetState = newTargetMap;
+      animationStart = performance.now();
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function lerpAngle(a, b, t) {
+      let delta = ((b - a + 540) % 360) - 180;
+      return (a + delta * t + 360) % 360;
+    }
+
+    function renderMapFrame(now) {
+      const t = Math.max(0, Math.min(1, (now - animationStart) / ANIMATION_MS));
+      const features = [];
+      const trailFeatures = [];
+
+      for (const [id, item] of displayState.entries()) {
+        item.latitude = lerp(item._startLat, item._targetLat, t);
+        item.longitude = lerp(item._startLon, item._targetLon, t);
+        item.trueTrack = lerpAngle(item._startHeading, item._targetHeading, t);
+
+        const visibleByFilter =
+          currentFilter === "all" ||
+          (currentFilter === "military" && item.militaryLikely) ||
+          (currentFilter === "watch" && item.watchHit);
+
+        if (visibleByFilter) {
+          features.push({
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [item.longitude, item.latitude]
+            },
+            properties: {
+              id,
+              callsign: item.callsign,
+              category: item.category,
+              heading: item.trueTrack || 0
+            }
+          });
+
+          const coords = [...(trails.get(id) || []), [item.longitude, item.latitude]];
+          if (coords.length > 1) {
+            trailFeatures.push({
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: coords
+              },
+              properties: {
+                category: item.category
+              }
+            });
+          }
+        }
+      }
+
+      const flightsSource = map.getSource("flights");
+      const trailsSource = map.getSource("trails");
+
+      if (flightsSource) {
+        flightsSource.setData({
+          type: "FeatureCollection",
+          features
+        });
+      }
+
+      if (trailsSource) {
+        trailsSource.setData({
+          type: "FeatureCollection",
+          features: trailFeatures
+        });
+      }
+
+      requestAnimationFrame(renderMapFrame);
+    }
+
     async function loadAircraft() {
       mapStatus.textContent = "Refreshing live data…";
 
       try {
-        currentFlights = await fetchFlights();
-        detectAlerts(currentFlights);
+        const flights = await fetchFlights();
+        latestFlights = flights;
+        detectAlerts(latestFlights);
+        updateTargets(latestFlights);
         applyCurrentFilter();
         mapStatus.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
       } catch (error) {
@@ -1120,9 +1270,8 @@
         watchlist = watchlist.sort();
         saveWatchlist();
         renderWatchlist();
-        refreshDerivedFlags();
-        applyCurrentFilter();
         addAlert("Watchlist updated", `Added ${value} to the watchlist.`, "watch");
+        loadAircraft();
       }
       watchInput.value = "";
     }
@@ -1168,7 +1317,8 @@
         currentRegion = btn.dataset.region;
         previousFlights = new Map();
         normalizeRegionButtons();
-        setMapToRegion();
+        const cfg = regionConfigs[currentRegion];
+        map.easeTo({ center: cfg.center, zoom: cfg.zoom, duration: 700 });
         await loadAircraft();
       });
     });
@@ -1185,19 +1335,54 @@
       watchlist = [];
       saveWatchlist();
       renderWatchlist();
-      refreshDerivedFlags();
-      applyCurrentFilter();
       addAlert("Watchlist cleared", "All watchlist prefixes were removed.", "warning");
+      loadAircraft();
     });
 
     exportAlertsBtn.addEventListener("click", exportAlerts);
 
-    renderAlerts();
-    renderWatchlist();
-    normalizeRegionButtons();
-    setMapToRegion();
-    loadAircraft();
-    setInterval(loadAircraft, 20000);
+    map.on("click", "planes", (e) => {
+      if (!e.features || !e.features.length) return;
+
+      const feature = e.features[0];
+      const id = feature.properties.id;
+      const flight = latestFlights.find(f => f.icao24 === id) || [...displayState.values()].find(f => f.icao24 === id);
+      if (!flight) return;
+
+      if (popup) popup.remove();
+
+      popup = new maplibregl.Popup({ closeButton: true, closeOnClick: true })
+        .setLngLat([flight.longitude, flight.latitude])
+        .setHTML(`
+          <div style="min-width:220px;">
+            <strong>${escapeHtml(flight.callsign)}</strong><br/>
+            ICAO24: ${escapeHtml(flight.icao24)}<br/>
+            Country: ${escapeHtml(flight.originCountry)}<br/>
+            Altitude: ${escapeHtml(formatAlt(flight.baroAltitude))}<br/>
+            Speed: ${escapeHtml(formatSpeed(flight.velocity))}<br/>
+            Track: ${flight.trueTrack !== null && flight.trueTrack !== undefined ? Math.round(flight.trueTrack) + "°" : "Unknown"}<br/>
+            Flag: ${flight.watchHit ? "Watchlist hit" : flight.militaryLikely ? "Military-likely" : "General traffic"}
+          </div>
+        `)
+        .addTo(map);
+    });
+
+    map.on("mouseenter", "planes", () => {
+      map.getCanvas().style.cursor = "pointer";
+    });
+
+    map.on("mouseleave", "planes", () => {
+      map.getCanvas().style.cursor = "";
+    });
+
+    map.on("load", async () => {
+      renderAlerts();
+      renderWatchlist();
+      normalizeRegionButtons();
+      requestAnimationFrame(renderMapFrame);
+      await loadAircraft();
+      setInterval(loadAircraft, REFRESH_MS);
+    });
   </script>
 </body>
 </html>
