@@ -4,6 +4,1340 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SpyAir — Live aircraft monitor</title>
+  <meta name="description" content="SpyAir is a live air activity monitor powered by FR24 data, with regional filters, watchlists, alerts, and smooth motion." />
+  <meta name="theme-color" content="#060d16" />
+
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.js"></script>
+
+  <style>
+    :root {
+      --bg: #060d16;
+      --bg-2: #0a1320;
+      --panel: rgba(255,255,255,0.05);
+      --panel-2: rgba(255,255,255,0.035);
+      --border: rgba(255,255,255,0.08);
+      --text: #eef4fb;
+      --muted: #93a8c2;
+      --accent: #7dd3fc;
+      --danger: #fca5a5;
+      --success: #86efac;
+      --warning: #fcd34d;
+      --shadow: 0 24px 70px rgba(0,0,0,0.35);
+      --radius: 20px;
+      --max: 1440px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(125,211,252,0.10), transparent 20%),
+        linear-gradient(180deg, #040b13 0%, #081220 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .container {
+      width: min(var(--max), calc(100% - 28px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(6, 13, 22, 0.82);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .topbar {
+      padding: 18px 0 14px;
+    }
+
+    .topbar-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .hero-box, .stats-box {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-box { padding: 22px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(125,211,252,0.08);
+      border: 1px solid rgba(125,211,252,0.16);
+      color: var(--accent);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -1.2px;
+    }
+
+    .hero-copy {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      max-width: 820px;
+      margin-bottom: 14px;
+    }
+
+    .hero-note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stats-box {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      min-height: 90px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .app {
+      padding: 6px 0 30px;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 350px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .sidebar, .rightbar {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .chip-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-radius: 11px;
+      padding: 9px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .chip.active {
+      background: rgba(125,211,252,0.12);
+      border-color: rgba(125,211,252,0.22);
+      color: var(--accent);
+    }
+
+    .watch-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .watch-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      color: #07111f;
+      background: linear-gradient(135deg, var(--accent), #9bd7ff);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border);
+    }
+
+    .watch-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .watch-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(134,239,172,0.08);
+      border: 1px solid rgba(134,239,172,0.18);
+      color: #dcfce7;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .watch-tag button {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 0;
+      font-size: 12px;
+    }
+
+    .map-panel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .map-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(125,211,252,0.08);
+      border: 1px solid rgba(125,211,252,0.16);
+    }
+
+    .status {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    #mapContainer {
+      height: 72vh;
+      min-height: 650px;
+      background: #081220;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .item.flight {
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .item.flight:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .item.military {
+      border-color: rgba(252,165,165,0.22);
+      background: rgba(252,165,165,0.06);
+    }
+
+    .item.watch {
+      border-color: rgba(134,239,172,0.22);
+      background: rgba(134,239,172,0.07);
+    }
+
+    .item.warning {
+      border-color: rgba(252,211,77,0.22);
+      background: rgba(252,211,77,0.07);
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .item-title {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .tag.military {
+      color: #fecaca;
+      border-color: rgba(252,165,165,0.22);
+      background: rgba(252,165,165,0.08);
+    }
+
+    .tag.watch {
+      color: #dcfce7;
+      border-color: rgba(134,239,172,0.22);
+      background: rgba(134,239,172,0.08);
+    }
+
+    .tag.warning {
+      color: var(--warning);
+      border-color: rgba(252,211,77,0.22);
+      background: rgba(252,211,77,0.08);
+    }
+
+    .tag.new {
+      color: var(--success);
+      border-color: rgba(134,239,172,0.22);
+      background: rgba(134,239,172,0.08);
+    }
+
+    .item-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .footer {
+      padding: 12px 0 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .maplibregl-popup-content {
+      background: #0b1626;
+      color: #f3f7fc;
+      border-radius: 14px;
+    }
+
+    .maplibregl-popup-tip {
+      border-top-color: #0b1626 !important;
+    }
+
+    @media (max-width: 1280px) {
+      .app-shell {
+        grid-template-columns: 260px minmax(0, 1fr);
+      }
+
+      .rightbar {
+        grid-column: 1 / -1;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .topbar-grid,
+      .app-shell,
+      .rightbar {
+        grid-template-columns: 1fr;
+      }
+
+      #mapContainer {
+        min-height: 500px;
+        height: 60vh;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .nav-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .stats-box {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .watch-row {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">Spy<span>Air</span> 🕵️‍♂️✈️</div>
+      <div class="nav-links">
+        <a href="#map">Map</a>
+        <a href="#alerts">Alerts</a>
+        <a href="#watchlist">Watchlist</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="topbar">
+    <div class="container topbar-grid">
+      <div class="hero-box">
+        <div class="eyebrow">FR24-backed live monitor</div>
+        <h1>Live air activity, built for signal.</h1>
+        <div class="hero-copy">
+          SpyAir now runs on real FR24-fed data and uses smooth interpolation between snapshots,
+          map-native rendering, trails, watchlists, and live alerts.
+        </div>
+        <div class="hero-note">
+          This version uses visible circles and labels, so aircraft cannot disappear because of icon glyph issues.
+        </div>
+      </div>
+
+      <div class="stats-box">
+        <div class="stat">
+          <strong id="aircraftCount">0</strong>
+          <span>Visible aircraft</span>
+        </div>
+        <div class="stat">
+          <strong id="militaryCount">0</strong>
+          <span>Military-likely</span>
+        </div>
+        <div class="stat">
+          <strong id="watchCount">0</strong>
+          <span>Watchlist hits</span>
+        </div>
+        <div class="stat">
+          <strong id="alertCount">0</strong>
+          <span>Recent alerts</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="app" id="map">
+    <div class="container app-shell">
+      <aside class="sidebar">
+        <div class="card">
+          <div class="card-title">Traffic filter</div>
+          <div class="chip-bar">
+            <button class="chip active" id="showAllBtn" type="button">All</button>
+            <button class="chip" id="showMilitaryBtn" type="button">Military-likely</button>
+            <button class="chip" id="showWatchBtn" type="button">Watchlist</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Region</div>
+          <div class="chip-bar">
+            <button class="chip active region-btn" data-region="poland" type="button">Poland</button>
+            <button class="chip region-btn" data-region="baltics" type="button">Baltics</button>
+            <button class="chip region-btn" data-region="blacksea" type="button">Black Sea</button>
+            <button class="chip region-btn" data-region="central" type="button">Central Europe</button>
+          </div>
+        </div>
+
+        <div class="card" id="watchlist">
+          <div class="card-title">Watchlist</div>
+          <div class="card-sub">Track prefixes like RCH, FORTE, NATO, ASCOT, PLF.</div>
+          <div class="watch-row">
+            <input id="watchInput" class="watch-input" type="text" placeholder="Add prefix..." />
+            <button id="addWatchBtn" class="btn btn-primary" type="button">Add</button>
+          </div>
+          <button id="clearWatchBtn" class="btn btn-secondary" type="button" style="margin-bottom:10px;">Clear all</button>
+          <div class="watch-tags" id="watchTags"></div>
+        </div>
+      </aside>
+
+      <main class="map-panel">
+        <div class="map-toolbar">
+          <div class="toolbar-left">
+            <div class="badge" id="regionBadge">Region: Poland</div>
+            <div class="badge" id="modeBadge">Mode: Live</div>
+          </div>
+          <div class="toolbar-right">
+            <div class="status" id="mapStatus">Loading live data…</div>
+          </div>
+        </div>
+        <div id="mapContainer"></div>
+      </main>
+
+      <aside class="rightbar">
+        <div class="card" id="alerts">
+          <div class="card-title">Live alerts</div>
+          <div class="card-sub" id="alertSubtitle">Watching for activity…</div>
+          <button id="exportAlertsBtn" class="btn btn-secondary" type="button" style="margin-bottom:10px;">Export alerts</button>
+          <div class="list" id="alertList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Active flights</div>
+          <div class="card-sub" id="panelSubtitle">Loading current aircraft…</div>
+          <div class="list" id="flightList"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>© 2026 SpyAir</div>
+      <div>FR24-backed OSINT air activity monitor</div>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = "https://spyair-api.mlodykawa.workers.dev";
+    const REFRESH_MS = 20000;
+    const ANIMATION_MS = 18000;
+
+    const regionConfigs = {
+      poland: {
+        label: "Poland",
+        center: [19.4, 52.1],
+        zoom: 6,
+        focusBox: { minLat: 49.0, maxLat: 54.9, minLon: 14.0, maxLon: 24.5 }
+      },
+      baltics: {
+        label: "Baltics",
+        center: [24.7, 56.2],
+        zoom: 6,
+        focusBox: { minLat: 54.0, maxLat: 59.8, minLon: 19.0, maxLon: 29.5 }
+      },
+      blacksea: {
+        label: "Black Sea",
+        center: [34.6, 43.2],
+        zoom: 6,
+        focusBox: { minLat: 40.0, maxLat: 47.8, minLon: 27.0, maxLon: 42.5 }
+      },
+      central: {
+        label: "Central Europe",
+        center: [17.2, 51.2],
+        zoom: 5,
+        focusBox: { minLat: 47.0, maxLat: 56.8, minLon: 8.0, maxLon: 26.0 }
+      }
+    };
+
+    const militaryPrefixes = [
+      "RCH", "RRR", "MMF", "NATO", "BAF", "QID", "CNV", "HKY", "ASY",
+      "AME", "SHEP", "DUKE", "LAGR", "BRK", "REDEYE", "FORTE", "JAKE",
+      "NAVY", "VM", "MC", "RAFAIR", "PACK", "MOOSE", "GAF", "IAF", "CTM",
+      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM", "PLF"
+    ];
+
+    const map = new maplibregl.Map({
+      container: "mapContainer",
+      center: regionConfigs.poland.center,
+      zoom: regionConfigs.poland.zoom,
+      attributionControl: true,
+      style: {
+        version: 8,
+        glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+        sources: {
+          osm: {
+            type: "raster",
+            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+            tileSize: 256,
+            attribution: "© OpenStreetMap contributors"
+          },
+          flights: {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          },
+          trails: {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] }
+          }
+        },
+        layers: [
+          { id: "osm", type: "raster", source: "osm" },
+          {
+            id: "trails",
+            type: "line",
+            source: "trails",
+            paint: {
+              "line-color": [
+                "match",
+                ["get", "category"],
+                "watch", "#86efac",
+                "military", "#fca5a5",
+                "#7dd3fc"
+              ],
+              "line-width": 2,
+              "line-opacity": 0.55
+            }
+          },
+          {
+            id: "planes",
+            type: "circle",
+            source: "flights",
+            paint: {
+              "circle-radius": 6,
+              "circle-color": [
+                "match",
+                ["get", "category"],
+                "watch", "#86efac",
+                "military", "#fca5a5",
+                "#7dd3fc"
+              ],
+              "circle-stroke-width": 1.5,
+              "circle-stroke-color": "#06101c"
+            }
+          },
+          {
+            id: "callsigns",
+            type: "symbol",
+            source: "flights",
+            layout: {
+              "text-field": ["get", "callsign"],
+              "text-size": 11,
+              "text-offset": [0, 1.25],
+              "text-anchor": "top",
+              "text-allow-overlap": true,
+              "text-ignore-placement": true
+            },
+            paint: {
+              "text-color": "#dbeafe",
+              "text-halo-color": "#06101c",
+              "text-halo-width": 1.1
+            }
+          }
+        ]
+      }
+    });
+
+    map.addControl(new maplibregl.NavigationControl(), "top-right");
+
+    const mapStatus = document.getElementById("mapStatus");
+    const regionBadge = document.getElementById("regionBadge");
+    const modeBadge = document.getElementById("modeBadge");
+
+    const aircraftCount = document.getElementById("aircraftCount");
+    const militaryCount = document.getElementById("militaryCount");
+    const watchCount = document.getElementById("watchCount");
+    const alertCount = document.getElementById("alertCount");
+
+    const flightList = document.getElementById("flightList");
+    const alertList = document.getElementById("alertList");
+    const panelSubtitle = document.getElementById("panelSubtitle");
+    const alertSubtitle = document.getElementById("alertSubtitle");
+
+    const showAllBtn = document.getElementById("showAllBtn");
+    const showMilitaryBtn = document.getElementById("showMilitaryBtn");
+    const showWatchBtn = document.getElementById("showWatchBtn");
+    const regionButtons = document.querySelectorAll(".region-btn");
+
+    const watchInput = document.getElementById("watchInput");
+    const addWatchBtn = document.getElementById("addWatchBtn");
+    const clearWatchBtn = document.getElementById("clearWatchBtn");
+    const watchTags = document.getElementById("watchTags");
+    const exportAlertsBtn = document.getElementById("exportAlertsBtn");
+
+    let currentFilter = "all";
+    let currentRegion = "poland";
+    let alerts = [];
+    let watchlist = loadWatchlist();
+    let previousFlights = new Map();
+
+    let latestFlights = [];
+    let displayState = new Map();
+    let trails = new Map();
+    let animationStart = performance.now();
+    let popup = null;
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function shortValue(value, fallback = "Unknown") {
+      const text = String(value || "").trim();
+      return text || fallback;
+    }
+
+    function formatAlt(feet) {
+      if (feet === null || feet === undefined) return "Unknown";
+      return Math.round(feet).toLocaleString() + " ft";
+    }
+
+    function formatSpeed(knots) {
+      if (knots === null || knots === undefined) return "Unknown";
+      return Math.round(knots) + " kt";
+    }
+
+    function currentFocusBox() {
+      return regionConfigs[currentRegion].focusBox;
+    }
+
+    function isInsideFocus(lat, lon) {
+      const box = currentFocusBox();
+      return lat >= box.minLat && lat <= box.maxLat && lon >= box.minLon && lon <= box.maxLon;
+    }
+
+    function isMilitaryLikely(callsign, country) {
+      const cs = String(callsign || "").trim().toUpperCase();
+      const c = String(country || "").trim().toUpperCase();
+
+      if (!cs) return false;
+      if (militaryPrefixes.some(prefix => cs.startsWith(prefix))) return true;
+      if (/^\d{2,}$/.test(cs)) return false;
+      if (cs.includes("AF") && cs.length <= 8) return true;
+      if (["UNITED STATES", "UNITED KINGDOM", "FRANCE", "GERMANY", "ITALY", "POLAND"].includes(c) &&
+          /^[A-Z]{2,6}\d{1,4}$/.test(cs)) return true;
+
+      return false;
+    }
+
+    function isWatchlistHit(callsign) {
+      const cs = String(callsign || "").trim().toUpperCase();
+      if (!cs) return false;
+      return watchlist.some(prefix => cs.startsWith(prefix));
+    }
+
+    function normalizeFlight(raw) {
+      const flight = {
+        icao24: raw.id || raw.icao24 || raw.callsign || String(Math.random()),
+        callsign: raw.callsign || "Unknown",
+        originCountry: raw.country || raw.originCountry || "Unknown",
+        latitude: raw.lat ?? raw.latitude,
+        longitude: raw.lon ?? raw.longitude,
+        baroAltitude: raw.altitude ?? raw.baroAltitude ?? null,
+        velocity: raw.speed ?? raw.velocity ?? null,
+        trueTrack: raw.heading ?? raw.trueTrack ?? 0
+      };
+
+      flight.militaryLikely = isMilitaryLikely(flight.callsign, flight.originCountry);
+      flight.watchHit = isWatchlistHit(flight.callsign);
+      flight.insideFocus = isInsideFocus(flight.latitude, flight.longitude);
+      flight.category = flight.watchHit ? "watch" : flight.militaryLikely ? "military" : "general";
+
+      return flight;
+    }
+
+    function sortFlights(flights) {
+      return [...flights].sort((a, b) => {
+        if (a.watchHit !== b.watchHit) return a.watchHit ? -1 : 1;
+        if (a.militaryLikely !== b.militaryLikely) return a.militaryLikely ? -1 : 1;
+        return (b.baroAltitude || 0) - (a.baroAltitude || 0);
+      });
+    }
+
+    function addAlert(title, text, type = "default") {
+      alerts.unshift({
+        id: Date.now() + Math.random(),
+        title,
+        text,
+        type,
+        time: new Date().toLocaleTimeString()
+      });
+      alerts = alerts.slice(0, 40);
+      renderAlerts();
+    }
+
+    function renderAlerts() {
+      alertList.innerHTML = "";
+
+      if (!alerts.length) {
+        alertList.innerHTML = '<div class="item-meta">No alerts yet.</div>';
+        alertCount.textContent = "0";
+        return;
+      }
+
+      for (const alert of alerts) {
+        const item = document.createElement("div");
+        let cls = "item";
+        let tagCls = "tag";
+        let tagText = "event";
+
+        if (alert.type === "military") {
+          cls += " military";
+          tagCls += " military";
+          tagText = "military";
+        } else if (alert.type === "watch") {
+          cls += " watch";
+          tagCls += " watch";
+          tagText = "watch";
+        } else if (alert.type === "warning") {
+          cls += " warning";
+          tagCls += " warning";
+          tagText = "warning";
+        } else if (alert.type === "new") {
+          tagCls += " new";
+          tagText = "new";
+        }
+
+        item.className = cls;
+        item.innerHTML = `
+          <div class="item-top">
+            <div class="item-title">${escapeHtml(alert.title)}</div>
+            <div class="${tagCls}">${escapeHtml(tagText)}</div>
+          </div>
+          <div class="item-meta">
+            ${escapeHtml(alert.text)}<br />
+            ${escapeHtml(alert.time)}
+          </div>
+        `;
+        alertList.appendChild(item);
+      }
+
+      alertCount.textContent = alerts.length.toLocaleString();
+    }
+
+    function renderFlightList(flights) {
+      flightList.innerHTML = "";
+
+      if (!flights.length) {
+        flightList.innerHTML = '<div class="item-meta">No aircraft match the current filter.</div>';
+        return;
+      }
+
+      flights.slice(0, 100).forEach((flight) => {
+        const item = document.createElement("div");
+        let cls = "item flight";
+        let tagCls = "tag";
+        let tagText = "general";
+
+        if (flight.watchHit) {
+          cls += " watch";
+          tagCls += " watch";
+          tagText = "watch";
+        } else if (flight.militaryLikely) {
+          cls += " military";
+          tagCls += " military";
+          tagText = "military";
+        }
+
+        item.className = cls;
+        item.innerHTML = `
+          <div class="item-top">
+            <div class="item-title">${escapeHtml(shortValue(flight.callsign))}</div>
+            <div class="${tagCls}">${escapeHtml(tagText)}</div>
+          </div>
+          <div class="item-meta">
+            ${escapeHtml(shortValue(flight.originCountry))}<br />
+            ${escapeHtml(formatAlt(flight.baroAltitude))} • ${escapeHtml(formatSpeed(flight.velocity))}<br />
+            ${flight.insideFocus ? "Inside focus region" : "Outside focus region"}
+          </div>
+        `;
+
+        item.addEventListener("click", () => {
+          map.flyTo({
+            center: [flight.longitude, flight.latitude],
+            zoom: Math.max(map.getZoom(), 8),
+            speed: 0.8
+          });
+        });
+
+        flightList.appendChild(item);
+      });
+    }
+
+    function applyCurrentFilter() {
+      let filtered = latestFlights;
+
+      if (currentFilter === "military") filtered = filtered.filter(f => f.militaryLikely);
+      else if (currentFilter === "watch") filtered = filtered.filter(f => f.watchHit);
+
+      aircraftCount.textContent = filtered.length.toLocaleString();
+      militaryCount.textContent = latestFlights.filter(f => f.militaryLikely).length.toLocaleString();
+      watchCount.textContent = latestFlights.filter(f => f.watchHit).length.toLocaleString();
+
+      if (currentFilter === "military") panelSubtitle.textContent = "Showing military-likely flights only";
+      else if (currentFilter === "watch") panelSubtitle.textContent = "Showing watchlist hits only";
+      else panelSubtitle.textContent = "Showing all currently visible flights";
+
+      renderFlightList(filtered);
+    }
+
+    function detectAlerts(newFlights) {
+      const nextMap = new Map(newFlights.map(f => [f.icao24, f]));
+
+      for (const flight of newFlights) {
+        const prev = previousFlights.get(flight.icao24);
+
+        if (!prev && flight.watchHit) addAlert("Watchlist hit appeared", `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`, "watch");
+        else if (!prev && flight.militaryLikely) addAlert("New military-likely flight", `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`, "new");
+
+        if (prev && !prev.insideFocus && flight.insideFocus && flight.militaryLikely) {
+          addAlert("Military-likely entered focus region", `${flight.callsign} moved into ${regionConfigs[currentRegion].label}.`, "military");
+        }
+
+        if (prev && !prev.watchHit && flight.watchHit) {
+          addAlert("Watchlist matched", `${flight.callsign} now matches your watchlist.`, "watch");
+        }
+      }
+
+      for (const [icao24, prev] of previousFlights.entries()) {
+        if (!nextMap.has(icao24) && prev.watchHit) addAlert("Watchlist flight disappeared", `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`, "warning");
+        else if (!nextMap.has(icao24) && prev.militaryLikely) addAlert("Military-likely disappeared", `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`, "warning");
+      }
+
+      previousFlights = nextMap;
+      alertSubtitle.textContent = alerts.length ? "Recent activity changes detected" : "Watching for activity…";
+    }
+
+    function saveWatchlist() {
+      localStorage.setItem("spyair_watchlist", JSON.stringify(watchlist));
+    }
+
+    function loadWatchlist() {
+      try {
+        const raw = localStorage.getItem("spyair_watchlist");
+        const parsed = raw ? JSON.parse(raw) : ["RCH", "FORTE", "NATO", "ASCOT", "PLF"];
+        return Array.isArray(parsed) ? parsed.map(v => String(v).toUpperCase()) : ["RCH", "FORTE", "NATO", "ASCOT", "PLF"];
+      } catch {
+        return ["RCH", "FORTE", "NATO", "ASCOT", "PLF"];
+      }
+    }
+
+    function renderWatchlist() {
+      watchTags.innerHTML = "";
+
+      if (!watchlist.length) {
+        watchTags.innerHTML = '<span class="item-meta">No watchlist prefixes yet.</span>';
+        return;
+      }
+
+      for (const tag of watchlist) {
+        const el = document.createElement("span");
+        el.className = "watch-tag";
+        el.innerHTML = `${escapeHtml(tag)} <button type="button" data-tag="${escapeHtml(tag)}">✕</button>`;
+        watchTags.appendChild(el);
+      }
+
+      watchTags.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tag = btn.getAttribute("data-tag");
+          watchlist = watchlist.filter(v => v !== tag);
+          saveWatchlist();
+          renderWatchlist();
+          loadAircraft();
+        });
+      });
+    }
+
+    function normalizeRegionButtons() {
+      regionButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.region === currentRegion);
+      });
+      regionBadge.textContent = `Region: ${regionConfigs[currentRegion].label}`;
+    }
+
+    async function fetchFlights() {
+      const response = await fetch(`${API_BASE}/api/live?region=${currentRegion}`);
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Worker returned non-JSON response");
+      }
+
+      if (!response.ok || !data.ok || !Array.isArray(data.flights)) {
+        throw new Error(data.error || "No valid flight data");
+      }
+
+      modeBadge.textContent = data.source === "fr24" ? "Mode: Live" : "Mode: Fallback";
+
+      return sortFlights(
+        data.flights
+          .filter((f) => f && f.lat != null && f.lon != null)
+          .map(normalizeFlight)
+      );
+    }
+
+    function updateTargets(flights) {
+      const incomingIds = new Set();
+
+      for (const f of flights) {
+        incomingIds.add(f.icao24);
+
+        const existing = displayState.get(f.icao24);
+        if (!existing) {
+          displayState.set(f.icao24, {
+            ...f,
+            _startLat: f.latitude,
+            _startLon: f.longitude,
+            _targetLat: f.latitude,
+            _targetLon: f.longitude
+          });
+        } else {
+          const trail = trails.get(f.icao24) || [];
+          trail.push([existing.longitude, existing.latitude]);
+          trails.set(f.icao24, trail.slice(-12));
+
+          existing._startLat = existing.latitude;
+          existing._startLon = existing.longitude;
+          existing._targetLat = f.latitude;
+          existing._targetLon = f.longitude;
+
+          existing.callsign = f.callsign;
+          existing.originCountry = f.originCountry;
+          existing.baroAltitude = f.baroAltitude;
+          existing.velocity = f.velocity;
+          existing.trueTrack = f.trueTrack;
+          existing.militaryLikely = f.militaryLikely;
+          existing.watchHit = f.watchHit;
+          existing.insideFocus = f.insideFocus;
+          existing.category = f.category;
+        }
+      }
+
+      for (const key of [...displayState.keys()]) {
+        if (!incomingIds.has(key)) {
+          displayState.delete(key);
+          trails.delete(key);
+        }
+      }
+
+      animationStart = performance.now();
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function renderMapFrame(now) {
+      const t = Math.max(0, Math.min(1, (now - animationStart) / ANIMATION_MS));
+      const features = [];
+      const trailFeatures = [];
+
+      for (const item of displayState.values()) {
+        item.latitude = lerp(item._startLat, item._targetLat, t);
+        item.longitude = lerp(item._startLon, item._targetLon, t);
+
+        const visibleByFilter =
+          currentFilter === "all" ||
+          (currentFilter === "military" && item.militaryLikely) ||
+          (currentFilter === "watch" && item.watchHit);
+
+        if (visibleByFilter) {
+          features.push({
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [item.longitude, item.latitude]
+            },
+            properties: {
+              id: item.icao24,
+              callsign: item.callsign,
+              category: item.category
+            }
+          });
+
+          const coords = [...(trails.get(item.icao24) || []), [item.longitude, item.latitude]];
+          if (coords.length > 1) {
+            trailFeatures.push({
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: coords
+              },
+              properties: {
+                category: item.category
+              }
+            });
+          }
+        }
+      }
+
+      const flightsSource = map.getSource("flights");
+      const trailsSource = map.getSource("trails");
+
+      if (flightsSource) {
+        flightsSource.setData({
+          type: "FeatureCollection",
+          features
+        });
+      }
+
+      if (trailsSource) {
+        trailsSource.setData({
+          type: "FeatureCollection",
+          features: trailFeatures
+        });
+      }
+
+      requestAnimationFrame(renderMapFrame);
+    }
+
+    async function loadAircraft() {
+      mapStatus.textContent = "Refreshing live data…";
+
+      try {
+        const flights = await fetchFlights();
+        latestFlights = flights;
+        detectAlerts(latestFlights);
+        updateTargets(latestFlights);
+        applyCurrentFilter();
+        mapStatus.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+      } catch (error) {
+        console.error(error);
+        mapStatus.textContent = "Live feed unavailable.";
+      }
+    }
+
+    function addWatchPrefix() {
+      const value = watchInput.value.trim().toUpperCase();
+      if (!value) return;
+      if (!watchlist.includes(value)) {
+        watchlist.push(value);
+        watchlist = watchlist.sort();
+        saveWatchlist();
+        renderWatchlist();
+        addAlert("Watchlist updated", `Added ${value} to the watchlist.`, "watch");
+        loadAircraft();
+      }
+      watchInput.value = "";
+    }
+
+    function exportAlerts() {
+      const blob = new Blob([JSON.stringify(alerts, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `spyair-alerts-${new Date().toISOString().replaceAll(":", "-")}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    showAllBtn.addEventListener("click", () => {
+      currentFilter = "all";
+      showAllBtn.classList.add("active");
+      showMilitaryBtn.classList.remove("active");
+      showWatchBtn.classList.remove("active");
+      applyCurrentFilter();
+    });
+
+    showMilitaryBtn.addEventListener("click", () => {
+      currentFilter = "military";
+      showMilitaryBtn.classList.add("active");
+      showAllBtn.classList.remove("active");
+      showWatchBtn.classList.remove("active");
+      applyCurrentFilter();
+    });
+
+    showWatchBtn.addEventListener("click", () => {
+      currentFilter = "watch";
+      showWatchBtn.classList.add("active");
+      showAllBtn.classList.remove("active");
+      showMilitaryBtn.classList.remove("active");
+      applyCurrentFilter();
+    });
+
+    regionButtons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        currentRegion = btn.dataset.region;
+        previousFlights = new Map();
+        normalizeRegionButtons();
+        const cfg = regionConfigs[currentRegion];
+        map.easeTo({ center: cfg.center, zoom: cfg.zoom, duration: 700 });
+        await loadAircraft();
+      });
+    });
+
+    addWatchBtn.addEventListener("click", addWatchPrefix);
+    watchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addWatchPrefix();
+      }
+    });
+
+    clearWatchBtn.addEventListener("click", () => {
+      watchlist = [];
+      saveWatchlist();
+      renderWatchlist();
+      addAlert("Watchlist cleared", "All watchlist prefixes were removed.", "warning");
+      loadAircraft();
+    });
+
+    exportAlertsBtn.addEventListener("click", exportAlerts);
+
+    map.on("click", "planes", (e) => {
+      if (!e.features || !e.features.length) return;
+
+      const feature = e.features[0];
+      const id = feature.properties.id;
+      const flight = latestFlights.find(f => f.icao24 === id) || [...displayState.values()].find(f => f.icao24 === id);
+      if (!flight) return;
+
+      if (popup) popup.remove();
+
+      popup = new maplibregl.Popup({ closeButton: true, closeOnClick: true })
+        .setLngLat([flight.longitude, flight.latitude])
+        .setHTML(`
+          <div style="min-width:220px;">
+            <strong>${escapeHtml(flight.callsign)}</strong><br/>
+            ICAO24: ${escapeHtml(flight.icao24)}<br/>
+            Country: ${escapeHtml(flight.originCountry)}<br/>
+            Altitude: ${escapeHtml(formatAlt(flight.baroAltitude))}<br/>
+            Speed: ${escapeHtml(formatSpeed(flight.velocity))}<br/>
+            Track: ${flight.trueTrack !== null && flight.trueTrack !== undefined ? Math.round(flight.trueTrack) + "°" : "Unknown"}<br/>
+            Flag: ${flight.watchHit ? "Watchlist hit" : flight.militaryLikely ? "Military-likely" : "General traffic"}
+          </div>
+        `)
+        .addTo(map);
+    });
+
+    map.on("mouseenter", "planes", () => {
+      map.getCanvas().style.cursor = "pointer";
+    });
+
+    map.on("mouseleave", "planes", () => {
+      map.getCanvas().style.cursor = "";
+    });
+
+    map.on("load", async () => {
+      renderAlerts();
+      renderWatchlist();
+      normalizeRegionButtons();
+      requestAnimationFrame(renderMapFrame);
+      await loadAircraft();
+      setInterval(loadAircraft, REFRESH_MS);
+    });
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpyAir — Live aircraft monitor</title>
   <meta
     name="description"
     content="SpyAir is a live air activity monitor powered by FR24 data, with regional filters, watchlists, alerts, and smooth motion."
