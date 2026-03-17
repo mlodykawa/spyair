@@ -3,51 +3,612 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpyAir</title>
+  <title>SpyAir — Military aircraft tracking</title>
+  <meta
+    name="description"
+    content="SpyAir is a military aircraft tracking and alerting platform for OSINT, analysts, journalists, and aviation enthusiasts."
+  />
   <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1a2b;
+      --card: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f4f7fb;
+      --muted: #a9b6c8;
+      --accent: #7dd3fc;
+      --accent-2: #93c5fd;
+      --success: #86efac;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1020;
-      color: white;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(125, 211, 252, 0.14), transparent 25%),
+        radial-gradient(circle at left center, rgba(147, 197, 253, 0.08), transparent 20%),
+        linear-gradient(180deg, #06101c 0%, #091424 100%);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(7, 17, 31, 0.75);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-inner {
       display: flex;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 24px;
+      justify-content: space-between;
+      padding: 16px 0;
     }
-    .box {
-      max-width: 700px;
-    }
-    h1 {
-      font-size: 52px;
-      margin-bottom: 12px;
-    }
-    p {
+
+    .brand {
       font-size: 20px;
-      color: #b7c0d8;
-      margin-bottom: 24px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
     }
-    a {
-      display: inline-block;
-      background: white;
-      color: #0b1020;
-      padding: 14px 22px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
+
+    .brand span {
+      color: var(--accent);
     }
-    a:hover {
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #05101d;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .hero {
+      padding: 72px 0 48px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(125, 211, 252, 0.08);
+      color: var(--accent);
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(40px, 6vw, 68px);
+      line-height: 1.02;
+      margin: 0 0 18px;
+      letter-spacing: -1.4px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.7;
+      max-width: 650px;
+      margin: 0 0 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .mini-note {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -40px auto;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(125, 211, 252, 0.18), transparent 65%);
+      pointer-events: none;
+    }
+
+    .map-box {
+      background: linear-gradient(180deg, #081321, #0d1b2c);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      height: 260px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.5;
+    }
+
+    .flight-line {
+      position: absolute;
+      width: 180px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      top: 90px;
+      left: 70px;
+      transform: rotate(18deg);
       opacity: 0.9;
+    }
+
+    .flight-line.two {
+      width: 140px;
+      top: 150px;
+      left: 160px;
+      transform: rotate(-24deg);
+    }
+
+    .dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 8px rgba(125, 211, 252, 0.12);
+    }
+
+    .dot.one { top: 84px; left: 214px; }
+    .dot.two { top: 143px; left: 232px; }
+
+    .plane {
+      position: absolute;
+      font-size: 18px;
+      filter: drop-shadow(0 0 12px rgba(125, 211, 252, 0.35));
+    }
+
+    .plane.one { top: 72px; left: 205px; transform: rotate(18deg); }
+    .plane.two { top: 131px; left: 224px; transform: rotate(-24deg); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    section {
+      padding: 40px 0;
+    }
+
+    .section-title {
+      font-size: 34px;
+      margin: 0 0 10px;
+      letter-spacing: -0.6px;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      max-width: 720px;
+      line-height: 1.7;
+      margin: 0 0 28px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .feature-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .feature-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .feature-item span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .waitlist {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(125, 211, 252, 0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(125, 211, 252, 0.14);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .waitlist h3 {
+      font-size: 30px;
+      margin: 0 0 10px;
+    }
+
+    .waitlist p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .waitlist-form {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .waitlist-form input {
+      flex: 1 1 240px;
+      min-width: 220px;
+      padding: 15px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      outline: none;
+    }
+
+    .waitlist-form input::placeholder {
+      color: #8ca0ba;
+    }
+
+    .footer {
+      padding: 28px 0 46px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 20px;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .waitlist,
+      .cards,
+      .feature-list {
+        grid-template-columns: 1fr;
+      }
+
+      .waitlist-form {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav-inner {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      .section-title {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>SpyAir 🕵️‍♂️✈️</h1>
-    <p>Military aircraft tracking and alerts.</p>
-    <a href="#">Coming soon</a>
-  </div>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">Spy<span>Air</span> 🕵️‍♂️✈️</div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#use-cases">Use cases</a>
+        <a href="#waitlist">Waitlist</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">OSINT air activity monitor</div>
+        <h1>Track military aircraft activity in real time.</h1>
+        <p>
+          SpyAir helps analysts, journalists, researchers, and aviation enthusiasts
+          monitor military and government aircraft, discover unusual movements,
+          and receive alerts when activity matters.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#waitlist">Join the waitlist</a>
+          <a class="btn btn-secondary" href="#features">See features</a>
+        </div>
+        <div class="mini-note">
+          Live map • alerts • watchlists • activity hotspots
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <div class="map-box">
+          <div class="grid-lines"></div>
+          <div class="flight-line"></div>
+          <div class="flight-line two"></div>
+          <div class="dot one"></div>
+          <div class="dot two"></div>
+          <div class="plane one">✈️</div>
+          <div class="plane two">✈️</div>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <strong>24/7</strong>
+            <span>Live monitoring</span>
+          </div>
+          <div class="stat">
+            <strong>Zones</strong>
+            <span>Custom alerts</span>
+          </div>
+          <div class="stat">
+            <strong>Replay</strong>
+            <span>Route history</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="features">
+    <div class="container">
+      <h2 class="section-title">Built for signal, not noise</h2>
+      <p class="section-subtitle">
+        SpyAir focuses on the features that matter most for monitoring military
+        and government aircraft activity, without overwhelming you with clutter.
+      </p>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h3>Military-only filtering</h3>
+          <p>
+            Focus on tankers, transports, ISR, AEW&C, and government aircraft
+            with cleaner views and faster discovery.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🚨</div>
+          <h3>Smart alerts</h3>
+          <p>
+            Get notified when aircraft enter a region, depart from key bases,
+            loiter, or match your watchlist.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🌍</div>
+          <h3>Hotspot map</h3>
+          <p>
+            Monitor where activity is rising across regions like the Baltics,
+            Eastern Europe, the Black Sea, or the Middle East.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="use-cases">
+    <div class="container">
+      <h2 class="section-title">What you will be able to do</h2>
+      <p class="section-subtitle">
+        Start with a fast live tracker, then layer in watchlists, alerts, and
+        historical context for deeper analysis.
+      </p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <strong>Live activity map</strong>
+          <span>See active military and government aircraft on a clean real-time map.</span>
+        </div>
+        <div class="feature-item">
+          <strong>Watch specific aircraft</strong>
+          <span>Follow selected tail numbers, hex codes, operators, and aircraft types.</span>
+        </div>
+        <div class="feature-item">
+          <strong>Historical replay</strong>
+          <span>Review movement patterns, recent routes, and activity windows.</span>
+        </div>
+        <div class="feature-item">
+          <strong>Regional monitoring</strong>
+          <span>Create your own zones and keep track of movements around them.</span>
+        </div>
+        <div class="feature-item">
+          <strong>Operator insights</strong>
+          <span>Group activity by mission type, aircraft family, or operator.</span>
+        </div>
+        <div class="feature-item">
+          <strong>OSINT workflow ready</strong>
+          <span>Use SpyAir as a fast dashboard for analysts, media, and researchers.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="waitlist">
+    <div class="container">
+      <div class="waitlist">
+        <div>
+          <h3>Get early access to SpyAir</h3>
+          <p>
+            Join the waitlist and be first to test the military aircraft tracker,
+            alerts, and live monitoring dashboard.
+          </p>
+        </div>
+
+        <form class="waitlist-form">
+          <input type="email" placeholder="Enter your email" />
+          <button class="btn btn-primary" type="submit">Join waitlist</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>© 2026 SpyAir</div>
+      <div>Military aircraft tracking and alerts</div>
+    </div>
+  </footer>
 </body>
 </html>
