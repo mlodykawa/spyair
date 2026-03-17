@@ -1534,7 +1534,7 @@
           throw new Error(`HTTP ${response.status}`);
         }
 
-        const data = await response.json();
+        let data;  try {   data = await response.json(); } catch (e) {   console.error("Bad JSON:", e);   return; }  if (!data || !data.states) {   console.warn("No data from API:", data);   return; }
         const states = Array.isArray(data.states) ? data.states : [];
 
         const validStates = states.filter((s) =>
