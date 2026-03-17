@@ -3,27 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpyAir — Military aircraft tracking</title>
+  <title>SpyAir — Military aircraft tracking and alerts</title>
   <meta
     name="description"
-    content="SpyAir is a military aircraft tracking and alerting platform for OSINT, analysts, journalists, and aviation enthusiasts."
+    content="SpyAir is a military aircraft tracking and alerting platform for analysts, journalists, researchers, and aviation enthusiasts."
   />
+  <meta property="og:title" content="SpyAir — Military aircraft tracking and alerts" />
+  <meta
+    property="og:description"
+    content="Track military aircraft activity in real time with alerts, watchlists, and route history."
+  />
+  <meta property="og:type" content="website" />
   <style>
     :root {
       --bg: #06101c;
-      --bg-soft: #0c1828;
-      --card: rgba(255, 255, 255, 0.06);
-      --card-strong: rgba(255, 255, 255, 0.08);
-      --border: rgba(255, 255, 255, 0.1);
+      --bg-soft: #0b1626;
+      --panel: rgba(255, 255, 255, 0.05);
+      --panel-strong: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-strong: rgba(125, 211, 252, 0.22);
       --text: #f3f7fc;
-      --muted: #9fb0c7;
+      --muted: #9eb0c8;
       --accent: #7dd3fc;
       --accent-2: #93c5fd;
+      --accent-3: #67e8f9;
       --success: #86efac;
-      --danger: #fca5a5;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --warning: #fcd34d;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
       --radius: 22px;
-      --max: 1160px;
+      --max-width: 1160px;
     }
 
     * {
@@ -36,11 +44,11 @@
 
     body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
       color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top right, rgba(125, 211, 252, 0.16), transparent 24%),
-        radial-gradient(circle at 10% 30%, rgba(147, 197, 253, 0.08), transparent 18%),
+        radial-gradient(circle at top right, rgba(125, 211, 252, 0.12), transparent 22%),
+        radial-gradient(circle at 12% 30%, rgba(147, 197, 253, 0.08), transparent 18%),
         linear-gradient(180deg, #05101b 0%, #081321 100%);
     }
 
@@ -49,17 +57,22 @@
       text-decoration: none;
     }
 
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
     .container {
-      width: min(var(--max), calc(100% - 32px));
+      width: min(var(--max-width), calc(100% - 32px));
       margin: 0 auto;
     }
 
     .nav {
       position: sticky;
       top: 0;
-      z-index: 30;
+      z-index: 50;
       backdrop-filter: blur(16px);
-      background: rgba(6, 16, 28, 0.8);
+      background: rgba(6, 16, 28, 0.80);
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     }
 
@@ -67,7 +80,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 24px;
       padding: 16px 0;
     }
 
@@ -75,6 +88,7 @@
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.3px;
+      white-space: nowrap;
     }
 
     .brand span {
@@ -83,8 +97,8 @@
 
     .nav-links {
       display: flex;
-      gap: 20px;
       align-items: center;
+      gap: 18px;
       flex-wrap: wrap;
     }
 
@@ -103,13 +117,14 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 14px 20px;
       border-radius: 14px;
+      padding: 14px 20px;
       font-weight: 700;
-      border: 1px solid transparent;
+      font-size: 15px;
+      line-height: 1;
       transition: 0.2s ease;
       cursor: pointer;
-      font-size: 15px;
+      border: 1px solid transparent;
     }
 
     .btn-primary {
@@ -124,9 +139,9 @@
     }
 
     .btn-secondary {
+      color: var(--text);
       background: rgba(255, 255, 255, 0.04);
       border-color: var(--border);
-      color: var(--text);
     }
 
     .btn-secondary:hover {
@@ -134,7 +149,7 @@
     }
 
     .hero {
-      padding: 72px 0 48px;
+      padding: 76px 0 48px;
     }
 
     .hero-grid {
@@ -159,24 +174,24 @@
 
     h1 {
       margin: 0 0 18px;
-      font-size: clamp(40px, 6vw, 70px);
+      font-size: clamp(40px, 6vw, 72px);
       line-height: 1.02;
-      letter-spacing: -1.4px;
+      letter-spacing: -1.5px;
     }
 
     .hero-copy p {
+      margin: 0 0 26px;
+      max-width: 680px;
       color: var(--muted);
       font-size: 19px;
       line-height: 1.75;
-      margin: 0 0 26px;
-      max-width: 680px;
     }
 
     .hero-actions {
       display: flex;
-      flex-wrap: wrap;
       gap: 14px;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
     }
 
     .hero-note {
@@ -185,13 +200,13 @@
     }
 
     .hero-card {
+      position: relative;
+      overflow: hidden;
       background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 22px;
       box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
     }
 
     .hero-card::after {
@@ -207,9 +222,9 @@
 
     .radar {
       position: relative;
-      height: 300px;
-      border-radius: 20px;
+      height: 320px;
       overflow: hidden;
+      border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.08);
       background:
         radial-gradient(circle at center, rgba(125, 211, 252, 0.08), transparent 55%),
@@ -227,51 +242,41 @@
       opacity: 0.55;
     }
 
-    .ring,
-    .ring::before,
-    .ring::after {
+    .ring-1,
+    .ring-2,
+    .ring-3 {
       position: absolute;
-      inset: 50%;
+      left: 50%;
+      top: 50%;
       transform: translate(-50%, -50%);
       border-radius: 50%;
-      border: 1px solid rgba(125, 211, 252, 0.12);
-      content: "";
+      border: 1px solid rgba(125, 211, 252, 0.14);
     }
 
-    .ring {
-      width: 90px;
-      height: 90px;
-    }
-
-    .ring::before {
-      width: 170px;
-      height: 170px;
-    }
-
-    .ring::after {
-      width: 250px;
-      height: 250px;
-    }
+    .ring-1 { width: 96px; height: 96px; }
+    .ring-2 { width: 180px; height: 180px; }
+    .ring-3 { width: 264px; height: 264px; }
 
     .sweep {
       position: absolute;
-      inset: 50%;
-      width: 180px;
-      height: 180px;
+      left: 50%;
+      top: 50%;
+      width: 220px;
+      height: 220px;
       transform: translate(-50%, -50%);
       border-radius: 50%;
       background: conic-gradient(
         from 280deg,
         rgba(125, 211, 252, 0) 0deg,
-        rgba(125, 211, 252, 0.05) 260deg,
-        rgba(125, 211, 252, 0.34) 320deg,
+        rgba(125, 211, 252, 0.03) 250deg,
+        rgba(125, 211, 252, 0.34) 315deg,
         rgba(125, 211, 252, 0) 360deg
       );
-      animation: spin 8s linear infinite;
+      animation: rotate 8s linear infinite;
       filter: blur(1px);
     }
 
-    @keyframes spin {
+    @keyframes rotate {
       to {
         transform: translate(-50%, -50%) rotate(360deg);
       }
@@ -284,17 +289,17 @@
     }
 
     .cross-x {
+      top: 50%;
       left: 0;
       right: 0;
-      top: 50%;
       height: 1px;
       transform: translateY(-50%);
     }
 
     .cross-y {
+      left: 50%;
       top: 0;
       bottom: 0;
-      left: 50%;
       width: 1px;
       transform: translateX(-50%);
     }
@@ -307,16 +312,16 @@
     }
 
     .track.one {
-      width: 170px;
-      top: 102px;
-      left: 80px;
+      width: 180px;
+      top: 112px;
+      left: 78px;
       transform: rotate(18deg);
     }
 
     .track.two {
-      width: 140px;
-      top: 176px;
-      left: 180px;
+      width: 146px;
+      top: 190px;
+      left: 186px;
       transform: rotate(-26deg);
     }
 
@@ -327,14 +332,14 @@
     }
 
     .plane.one {
-      top: 90px;
-      left: 210px;
+      top: 101px;
+      left: 214px;
       transform: rotate(18deg);
     }
 
     .plane.two {
-      top: 165px;
-      left: 250px;
+      top: 178px;
+      left: 255px;
       transform: rotate(-26deg);
     }
 
@@ -348,13 +353,13 @@
     }
 
     .ping.one {
-      top: 96px;
-      left: 228px;
+      top: 107px;
+      left: 232px;
     }
 
     .ping.two {
-      top: 170px;
-      left: 266px;
+      top: 183px;
+      left: 271px;
     }
 
     .card-stats {
@@ -364,10 +369,10 @@
     }
 
     .stat {
+      padding: 14px;
+      border-radius: 16px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 14px;
     }
 
     .stat strong {
@@ -382,7 +387,7 @@
     }
 
     section {
-      padding: 42px 0;
+      padding: 44px 0;
     }
 
     .section-head {
@@ -396,10 +401,10 @@
     }
 
     .section-subtitle {
-      color: var(--muted);
-      max-width: 760px;
-      line-height: 1.75;
       margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.75;
     }
 
     .grid-3 {
@@ -409,10 +414,10 @@
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
       padding: 22px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow);
     }
 
@@ -440,10 +445,10 @@
     }
 
     .use-item {
+      padding: 16px;
+      border-radius: 18px;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 16px;
     }
 
     .use-item strong {
@@ -465,22 +470,22 @@
     }
 
     .step {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
       padding: 18px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
     }
 
     .step-number {
       width: 34px;
       height: 34px;
-      border-radius: 50%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
+      border-radius: 50%;
       background: rgba(125, 211, 252, 0.12);
       color: var(--accent);
+      font-weight: 800;
       margin-bottom: 12px;
     }
 
@@ -503,16 +508,28 @@
     }
 
     .price-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 22px;
       padding: 24px;
+      border-radius: 22px;
+      background: var(--panel);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow);
     }
 
     .price-card.featured {
-      border-color: rgba(125, 211, 252, 0.3);
-      background: linear-gradient(180deg, rgba(125, 211, 252, 0.1), rgba(255,255,255,0.04));
+      background: linear-gradient(180deg, rgba(125, 211, 252, 0.10), rgba(255,255,255,0.04));
+      border-color: var(--border-strong);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(125, 211, 252, 0.10);
+      border: 1px solid rgba(125, 211, 252, 0.18);
     }
 
     .price-card h3 {
@@ -527,8 +544,8 @@
     }
 
     .price-sub {
-      color: var(--muted);
       margin: 0 0 18px;
+      color: var(--muted);
       font-size: 14px;
     }
 
@@ -539,19 +556,19 @@
     }
 
     .price-item {
+      position: relative;
+      padding-left: 18px;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.6;
-      padding-left: 18px;
-      position: relative;
     }
 
     .price-item::before {
       content: "•";
-      color: var(--accent);
       position: absolute;
       left: 0;
       top: 0;
+      color: var(--accent);
     }
 
     .faq {
@@ -560,10 +577,10 @@
     }
 
     .faq-item {
+      padding: 18px;
+      border-radius: 18px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 18px;
     }
 
     .faq-item strong {
@@ -574,8 +591,8 @@
 
     .faq-item span {
       color: var(--muted);
-      line-height: 1.7;
       font-size: 14px;
+      line-height: 1.7;
     }
 
     .waitlist {
@@ -583,10 +600,10 @@
       grid-template-columns: 1.08fr 0.92fr;
       gap: 20px;
       align-items: center;
-      background: linear-gradient(180deg, rgba(125, 211, 252, 0.09), rgba(255,255,255,0.03));
-      border: 1px solid rgba(125, 211, 252, 0.15);
-      border-radius: 24px;
       padding: 28px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(125, 211, 252, 0.09), rgba(255,255,255,0.03));
+      border: 1px solid rgba(125, 211, 252, 0.16);
       box-shadow: var(--shadow);
     }
 
@@ -603,9 +620,9 @@
 
     .waitlist-form {
       display: flex;
+      justify-content: flex-end;
       gap: 12px;
       flex-wrap: wrap;
-      justify-content: flex-end;
     }
 
     .waitlist-form input {
@@ -616,12 +633,19 @@
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.05);
       color: var(--text);
-      outline: none;
       font-size: 15px;
+      outline: none;
     }
 
     .waitlist-form input::placeholder {
-      color: #8ca0ba;
+      color: #89a0bb;
+    }
+
+    .disclaimer {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
     }
 
     .footer {
@@ -716,7 +740,9 @@
       <div class="hero-card">
         <div class="radar">
           <div class="grid"></div>
-          <div class="ring"></div>
+          <div class="ring-1"></div>
+          <div class="ring-2"></div>
+          <div class="ring-3"></div>
           <div class="sweep"></div>
           <div class="cross-x"></div>
           <div class="cross-y"></div>
@@ -761,7 +787,7 @@
           <div class="icon">🎯</div>
           <h3>Military-only filtering</h3>
           <p>
-            Focus on tankers, transports, ISR, AEW&C, and government aircraft
+            Focus on tankers, transports, ISR, AEW&amp;C, and government aircraft
             with cleaner views and faster discovery.
           </p>
         </div>
@@ -883,6 +909,7 @@
         </div>
 
         <div class="price-card featured">
+          <div class="badge">Most popular</div>
           <h3>Pro</h3>
           <div class="price-tag">$19</div>
           <p class="price-sub">For OSINT and aviation power users</p>
@@ -950,6 +977,9 @@
             Join the waitlist and be first to test the military aircraft tracker,
             live monitoring dashboard, alerts, and route history.
           </p>
+          <div class="disclaimer">
+            This is an early landing page. The email form is currently a placeholder until we connect a real waitlist backend.
+          </div>
         </div>
 
         <form class="waitlist-form">
