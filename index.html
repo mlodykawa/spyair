@@ -3,18 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpyAir — Live aircraft tracking</title>
-  <meta
-    name="description"
-    content="SpyAir tracks aircraft activity with live FR24-powered data, military-likely filtering, watchlists, and alerts."
-  />
-  <meta property="og:title" content="SpyAir — Live aircraft tracking" />
-  <meta
-    property="og:description"
-    content="Live aircraft tracking with military-likely filtering, watchlists, regional monitoring, and alerts."
-  />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#07111f" />
+  <title>SpyAir — Live aircraft monitor</title>
+  <meta name="description" content="SpyAir is a live air activity monitor powered by FR24 data, with regional filters, watchlists, and alerts." />
+  <meta name="theme-color" content="#060d16" />
 
   <link
     rel="stylesheet"
@@ -25,64 +16,55 @@
 
   <style>
     :root {
-      --bg: #07111f;
+      --bg: #060d16;
+      --bg-2: #0a1320;
       --panel: rgba(255,255,255,0.05);
-      --panel-2: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.10);
-      --text: #f4f7fb;
-      --muted: #9db0ca;
+      --panel-2: rgba(255,255,255,0.035);
+      --border: rgba(255,255,255,0.08);
+      --text: #eef4fb;
+      --muted: #93a8c2;
       --accent: #7dd3fc;
-      --accent-2: #93c5fd;
       --danger: #fca5a5;
       --success: #86efac;
       --warning: #fcd34d;
       --shadow: 0 24px 70px rgba(0,0,0,0.35);
-      --radius: 22px;
-      --max: 1260px;
+      --radius: 20px;
+      --max: 1400px;
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
+    html, body { margin: 0; padding: 0; }
     body {
-      margin: 0;
-      color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(circle at top right, rgba(125,211,252,0.13), transparent 22%),
-        radial-gradient(circle at 10% 30%, rgba(147,197,253,0.08), transparent 18%),
-        linear-gradient(180deg, #05101b 0%, #081321 100%);
+        radial-gradient(circle at top right, rgba(125,211,252,0.10), transparent 20%),
+        linear-gradient(180deg, #040b13 0%, #081220 100%);
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button, input {
-      font: inherit;
-    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
 
     .container {
-      width: min(var(--max), calc(100% - 32px));
+      width: min(var(--max), calc(100% - 28px));
       margin: 0 auto;
     }
 
     .nav {
       position: sticky;
       top: 0;
-      z-index: 60;
-      backdrop-filter: blur(14px);
-      background: rgba(7, 17, 31, 0.78);
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(6, 13, 22, 0.82);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
     .nav-inner {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 20px;
-      padding: 16px 0;
+      padding: 14px 0;
     }
 
     .brand {
@@ -91,15 +73,13 @@
       letter-spacing: -0.4px;
     }
 
-    .brand span {
-      color: var(--accent);
-    }
+    .brand span { color: var(--accent); }
 
     .nav-links {
       display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
+      gap: 16px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .nav-links a {
@@ -111,207 +91,79 @@
       color: var(--text);
     }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border-radius: 14px;
-      padding: 12px 16px;
-      border: 1px solid transparent;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-      transition: 0.2s ease;
+    .topbar {
+      padding: 18px 0 14px;
     }
 
-    .btn-primary {
-      color: #06101c;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    .topbar-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .hero-box, .stats-box {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
       box-shadow: var(--shadow);
     }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      color: var(--text);
-      background: rgba(255,255,255,0.04);
-      border-color: var(--border);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.07);
-    }
-
-    .hero {
-      padding: 72px 0 40px;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 32px;
-      align-items: center;
+    .hero-box {
+      padding: 22px;
     }
 
     .eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
+      padding: 7px 11px;
       border-radius: 999px;
       background: rgba(125,211,252,0.08);
-      border: 1px solid rgba(125,211,252,0.18);
+      border: 1px solid rgba(125,211,252,0.16);
       color: var(--accent);
-      font-size: 13px;
-      margin-bottom: 18px;
+      font-size: 12px;
+      margin-bottom: 14px;
     }
 
     h1 {
-      margin: 0 0 18px;
-      font-size: clamp(40px, 6vw, 70px);
+      margin: 0 0 12px;
+      font-size: clamp(30px, 5vw, 54px);
       line-height: 1.02;
-      letter-spacing: -1.4px;
+      letter-spacing: -1.2px;
     }
 
-    .hero-copy p {
-      margin: 0 0 26px;
-      max-width: 700px;
+    .hero-copy {
       color: var(--muted);
-      font-size: 19px;
-      line-height: 1.75;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
+      font-size: 16px;
+      line-height: 1.7;
+      max-width: 820px;
+      margin-bottom: 14px;
     }
 
     .hero-note {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    .hero-card {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 22px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-      box-shadow: var(--shadow);
-    }
-
-    .hero-card::after {
-      content: "";
-      position: absolute;
-      right: -40px;
-      bottom: -40px;
-      width: 180px;
-      height: 180px;
-      background: radial-gradient(circle, rgba(125,211,252,0.16), transparent 65%);
-      pointer-events: none;
-    }
-
-    .radar {
-      position: relative;
-      height: 300px;
-      overflow: hidden;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background:
-        radial-gradient(circle at center, rgba(125,211,252,0.08), transparent 55%),
-        linear-gradient(180deg, #071220, #0b1828);
-      margin-bottom: 18px;
-    }
-
-    .grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 42px 42px;
-      opacity: 0.55;
-    }
-
-    .ring-1, .ring-2, .ring-3 {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      border: 1px solid rgba(125,211,252,0.14);
-    }
-
-    .ring-1 { width: 96px; height: 96px; }
-    .ring-2 { width: 180px; height: 180px; }
-    .ring-3 { width: 264px; height: 264px; }
-
-    .sweep {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 220px;
-      height: 220px;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      background: conic-gradient(
-        from 280deg,
-        rgba(125,211,252,0) 0deg,
-        rgba(125,211,252,0.03) 250deg,
-        rgba(125,211,252,0.34) 315deg,
-        rgba(125,211,252,0) 360deg
-      );
-      animation: rotate 8s linear infinite;
-      filter: blur(1px);
-    }
-
-    @keyframes rotate {
-      to { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    .cross-x, .cross-y {
-      position: absolute;
-      background: rgba(255,255,255,0.06);
-    }
-
-    .cross-x {
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 1px;
-      transform: translateY(-50%);
-    }
-
-    .cross-y {
-      left: 50%;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      transform: translateX(-50%);
-    }
-
-    .stats {
+    .stats-box {
+      padding: 16px;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
 
     .stat {
-      padding: 14px;
       border-radius: 16px;
+      padding: 14px;
       background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.06);
+      min-height: 90px;
     }
 
     .stat strong {
       display: block;
-      font-size: 22px;
+      font-size: 24px;
       margin-bottom: 6px;
     }
 
@@ -320,106 +172,61 @@
       font-size: 13px;
     }
 
-    section {
-      padding: 42px 0;
+    .app {
+      padding: 6px 0 30px;
     }
 
-    .section-head {
-      margin-bottom: 26px;
+    .app-shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 350px;
+      gap: 16px;
+      align-items: start;
     }
 
-    .section-title {
-      margin: 0 0 10px;
-      font-size: 34px;
-      letter-spacing: -0.6px;
+    .sidebar, .rightbar {
+      display: grid;
+      gap: 16px;
     }
 
-    .section-subtitle {
-      margin: 0;
-      max-width: 760px;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-
-    .map-shell {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 22px;
-      padding: 16px;
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
       box-shadow: var(--shadow);
     }
 
-    .map-topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .badges {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .badge {
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(125,211,252,0.08);
-      border: 1px solid rgba(125,211,252,0.16);
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .status {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .controls-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .control-card,
-    .panel-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 14px;
-    }
-
-    .control-title,
-    .panel-title {
+    .card-title {
       font-size: 15px;
       font-weight: 700;
       margin-bottom: 10px;
     }
 
-    .chip-bar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
     }
 
-    .toggle-btn {
+    .chip-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.04);
       color: var(--text);
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 14px;
+      border-radius: 11px;
+      padding: 9px 12px;
+      font-size: 13px;
       cursor: pointer;
       transition: 0.2s ease;
     }
 
-    .toggle-btn.active {
+    .chip.active {
       background: rgba(125,211,252,0.12);
       border-color: rgba(125,211,252,0.22);
       color: var(--accent);
@@ -427,33 +234,52 @@
 
     .watch-row {
       display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 10px;
-      align-items: center;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
     .watch-input {
       width: 100%;
-      padding: 11px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       color: var(--text);
+      padding: 10px 12px;
       outline: none;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      color: #07111f;
+      background: linear-gradient(135deg, var(--accent), #9bd7ff);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border);
     }
 
     .watch-tags {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 12px;
     }
 
     .watch-tag {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 999px;
       background: rgba(134,239,172,0.08);
       border: 1px solid rgba(134,239,172,0.18);
@@ -471,36 +297,58 @@
       font-size: 12px;
     }
 
-    .map-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 380px;
-      gap: 16px;
-      align-items: start;
+    .map-panel {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .map-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(125,211,252,0.08);
+      border: 1px solid rgba(125,211,252,0.16);
+    }
+
+    .status {
+      font-size: 13px;
+      color: var(--muted);
     }
 
     #mapContainer {
-      height: 620px;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: #0b1728;
-    }
-
-    .side-panel {
-      display: grid;
-      gap: 16px;
-    }
-
-    .panel-sub {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 12px;
+      height: 72vh;
+      min-height: 650px;
+      background: #081220;
     }
 
     .list {
       display: grid;
       gap: 10px;
-      max-height: 280px;
+      max-height: 320px;
       overflow: auto;
       padding-right: 4px;
     }
@@ -538,9 +386,9 @@
 
     .item-top {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 10px;
+      align-items: center;
       margin-bottom: 6px;
     }
 
@@ -588,75 +436,27 @@
       line-height: 1.55;
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-
-    .card {
-      padding: 22px;
-      border-radius: 22px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-
-    .card .icon {
-      font-size: 28px;
-      margin-bottom: 14px;
-    }
-
-    .card h3 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.75;
-      font-size: 15px;
-    }
-
-    .faq {
-      display: grid;
-      gap: 14px;
-    }
-
-    .faq-item {
-      padding: 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .faq-item strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 16px;
-    }
-
-    .faq-item span {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
     .footer {
-      padding: 30px 0 46px;
+      padding: 12px 0 28px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
       border-top: 1px solid rgba(255,255,255,0.08);
-      padding-top: 20px;
+      padding-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .plane-label {
+      color: #dbeafe;
+      font-size: 11px;
+      font-weight: 700;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+      white-space: nowrap;
     }
 
     .leaflet-popup-content-wrapper,
@@ -671,26 +471,27 @@
       min-width: 220px;
     }
 
-    @media (max-width: 1180px) {
-      .controls-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 1120px) {
-      .map-grid {
-        grid-template-columns: 1fr;
+    @media (max-width: 1280px) {
+      .app-shell {
+        grid-template-columns: 260px minmax(0, 1fr);
       }
 
-      .list {
-        max-height: 260px;
+      .rightbar {
+        grid-column: 1 / -1;
+        grid-template-columns: 1fr 1fr;
       }
     }
 
     @media (max-width: 980px) {
-      .hero-grid,
-      .cards {
+      .topbar-grid,
+      .app-shell,
+      .rightbar {
         grid-template-columns: 1fr;
+      }
+
+      #mapContainer {
+        min-height: 500px;
+        height: 60vh;
       }
     }
 
@@ -708,16 +509,8 @@
         grid-template-columns: 1fr;
       }
 
-      .section-title {
-        font-size: 28px;
-      }
-
       h1 {
-        font-size: 42px;
-      }
-
-      #mapContainer {
-        height: 460px;
+        font-size: 40px;
       }
     }
   </style>
@@ -728,205 +521,115 @@
       <div class="brand">Spy<span>Air</span> 🕵️‍♂️✈️</div>
       <div class="nav-links">
         <a href="#map">Map</a>
-        <a href="#features">Features</a>
-        <a href="#faq">FAQ</a>
+        <a href="#alerts">Alerts</a>
+        <a href="#watchlist">Watchlist</a>
       </div>
     </div>
   </nav>
 
-  <header class="hero">
-    <div class="container hero-grid">
-      <div class="hero-copy">
-        <div class="eyebrow">FR24-powered live prototype</div>
-        <h1>Track aircraft activity with real data.</h1>
-        <p>
-          SpyAir combines live flight data, military-likely filtering,
-          regional views, watchlists, and a running alert feed in one interface.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#map">Open live map</a>
-          <a class="btn btn-secondary" href="#features">See features</a>
+  <section class="topbar">
+    <div class="container topbar-grid">
+      <div class="hero-box">
+        <div class="eyebrow">FR24-backed live monitor</div>
+        <h1>Live air activity, built for signal.</h1>
+        <div class="hero-copy">
+          SpyAir now runs on real FR24-fed data and gives you a cleaner workflow for
+          regional monitoring, military-likely spotting, watchlists, and live alerts.
         </div>
         <div class="hero-note">
-          FR24 data • watchlists • regions • live alerts • smooth fallback
+          This version changes the interface, not only the data source.
         </div>
       </div>
 
-      <div class="hero-card">
-        <div class="radar">
-          <div class="grid"></div>
-          <div class="ring-1"></div>
-          <div class="ring-2"></div>
-          <div class="ring-3"></div>
-          <div class="sweep"></div>
-          <div class="cross-x"></div>
-          <div class="cross-y"></div>
+      <div class="stats-box">
+        <div class="stat">
+          <strong id="aircraftCount">0</strong>
+          <span>Visible aircraft</span>
         </div>
-
-        <div class="stats">
-          <div class="stat">
-            <strong id="aircraftCount">0</strong>
-            <span>Visible aircraft</span>
-          </div>
-          <div class="stat">
-            <strong id="militaryCount">0</strong>
-            <span>Military-likely</span>
-          </div>
-          <div class="stat">
-            <strong id="watchCount">0</strong>
-            <span>Watchlist hits</span>
-          </div>
-          <div class="stat">
-            <strong id="alertCount">0</strong>
-            <span>Recent alerts</span>
-          </div>
+        <div class="stat">
+          <strong id="militaryCount">0</strong>
+          <span>Military-likely</span>
+        </div>
+        <div class="stat">
+          <strong id="watchCount">0</strong>
+          <span>Watchlist hits</span>
+        </div>
+        <div class="stat">
+          <strong id="alertCount">0</strong>
+          <span>Recent alerts</span>
         </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <section id="map">
-    <div class="container">
-      <div class="section-head">
-        <h2 class="section-title">Live aircraft map</h2>
-        <p class="section-subtitle">
-          Regional live tracking with military-likely filtering, watchlists, and alerts.
-        </p>
-      </div>
+  <section class="app" id="map">
+    <div class="container app-shell">
+      <aside class="sidebar">
+        <div class="card">
+          <div class="card-title">Traffic filter</div>
+          <div class="chip-bar">
+            <button class="chip active" id="showAllBtn" type="button">All</button>
+            <button class="chip" id="showMilitaryBtn" type="button">Military-likely</button>
+            <button class="chip" id="showWatchBtn" type="button">Watchlist</button>
+          </div>
+        </div>
 
-      <div class="map-shell">
-        <div class="map-topbar">
-          <div class="badges">
-            <div class="badge">FR24 source</div>
-            <div class="badge">Auto refresh</div>
+        <div class="card">
+          <div class="card-title">Region</div>
+          <div class="chip-bar">
+            <button class="chip active region-btn" data-region="poland" type="button">Poland</button>
+            <button class="chip region-btn" data-region="baltics" type="button">Baltics</button>
+            <button class="chip region-btn" data-region="blacksea" type="button">Black Sea</button>
+            <button class="chip region-btn" data-region="central" type="button">Central Europe</button>
+          </div>
+        </div>
+
+        <div class="card" id="watchlist">
+          <div class="card-title">Watchlist</div>
+          <div class="card-sub">Track prefixes like RCH, FORTE, NATO, ASCOT, PLF.</div>
+          <div class="watch-row">
+            <input id="watchInput" class="watch-input" type="text" placeholder="Add prefix..." />
+            <button id="addWatchBtn" class="btn btn-primary" type="button">Add</button>
+          </div>
+          <button id="clearWatchBtn" class="btn btn-secondary" type="button" style="margin-bottom:10px;">Clear all</button>
+          <div class="watch-tags" id="watchTags"></div>
+        </div>
+      </aside>
+
+      <main class="map-panel">
+        <div class="map-toolbar">
+          <div class="toolbar-left">
             <div class="badge" id="regionBadge">Region: Poland</div>
             <div class="badge" id="modeBadge">Mode: Live</div>
           </div>
-          <div class="status" id="mapStatus">Loading live data…</div>
-        </div>
-
-        <div class="controls-grid">
-          <div class="control-card">
-            <div class="control-title">Traffic filters</div>
-            <div class="chip-bar">
-              <button class="toggle-btn active" id="showAllBtn" type="button">All aircraft</button>
-              <button class="toggle-btn" id="showMilitaryBtn" type="button">Military-likely only</button>
-              <button class="toggle-btn" id="showWatchBtn" type="button">Watchlist only</button>
-            </div>
-          </div>
-
-          <div class="control-card">
-            <div class="control-title">Regions</div>
-            <div class="chip-bar">
-              <button class="toggle-btn active region-btn" data-region="poland" type="button">Poland</button>
-              <button class="toggle-btn region-btn" data-region="baltics" type="button">Baltics</button>
-              <button class="toggle-btn region-btn" data-region="blacksea" type="button">Black Sea</button>
-              <button class="toggle-btn region-btn" data-region="central" type="button">Central Europe</button>
-            </div>
+          <div class="toolbar-right">
+            <div class="status" id="mapStatus">Loading live data…</div>
           </div>
         </div>
+        <div id="mapContainer"></div>
+      </main>
 
-        <div class="control-card" style="margin-bottom:14px;">
-          <div class="control-title">Watchlist</div>
-          <div class="watch-row">
-            <input id="watchInput" class="watch-input" type="text" placeholder="Add callsign prefix, e.g. RCH, FORTE, NATO" />
-            <button id="addWatchBtn" class="btn btn-primary" type="button">Add</button>
-            <button id="clearWatchBtn" class="btn btn-secondary" type="button">Clear all</button>
-          </div>
-          <div class="watch-tags" id="watchTags"></div>
-        </div>
-
-        <div class="map-grid">
-          <div id="mapContainer"></div>
-
-          <aside class="side-panel">
-            <div class="panel-card">
-              <div class="panel-title">Live alerts</div>
-              <div class="panel-sub" id="alertSubtitle">Watching for activity…</div>
-              <div style="margin-bottom:10px;">
-                <button id="exportAlertsBtn" class="btn btn-secondary" type="button">Export alerts</button>
-              </div>
-              <div class="list" id="alertList"></div>
-            </div>
-
-            <div class="panel-card">
-              <div class="panel-title">Active flights</div>
-              <div class="panel-sub" id="panelSubtitle">Loading current aircraft…</div>
-              <div class="list" id="flightList"></div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="features">
-    <div class="container">
-      <div class="section-head">
-        <h2 class="section-title">What this version does</h2>
-        <p class="section-subtitle">
-          It already behaves like a proper live monitoring prototype instead of a placeholder page.
-        </p>
-      </div>
-
-      <div class="cards">
-        <div class="card">
-          <div class="icon">📡</div>
-          <h3>Real source</h3>
-          <p>
-            Your Worker now serves real FR24-backed data instead of OpenSky or static mock-only mode.
-          </p>
+      <aside class="rightbar">
+        <div class="card" id="alerts">
+          <div class="card-title">Live alerts</div>
+          <div class="card-sub" id="alertSubtitle">Watching for activity…</div>
+          <button id="exportAlertsBtn" class="btn btn-secondary" type="button" style="margin-bottom:10px;">Export alerts</button>
+          <div class="list" id="alertList"></div>
         </div>
 
         <div class="card">
-          <div class="icon">✅</div>
-          <h3>Watchlists and filters</h3>
-          <p>
-            Add your own callsign prefixes and isolate military-likely or watchlist traffic instantly.
-          </p>
+          <div class="card-title">Active flights</div>
+          <div class="card-sub" id="panelSubtitle">Loading current aircraft…</div>
+          <div class="list" id="flightList"></div>
         </div>
-
-        <div class="card">
-          <div class="icon">🚨</div>
-          <h3>Useful alert feed</h3>
-          <p>
-            New flights, watchlist hits, entries into region, and disappearances show up in the alert panel.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="faq">
-    <div class="container">
-      <div class="section-head">
-        <h2 class="section-title">Important notes</h2>
-        <p class="section-subtitle">
-          This version is strong for prototyping, but still heuristic-based.
-        </p>
-      </div>
-
-      <div class="faq">
-        <div class="faq-item">
-          <strong>Is this a precise military detector?</strong>
-          <span>No. It is a first-pass classifier based on callsign patterns and watchlist logic.</span>
-        </div>
-        <div class="faq-item">
-          <strong>Why are some fields missing?</strong>
-          <span>Your current normalized FR24 response has heading and altitude, but speed and country can be null or unknown depending on the source record.</span>
-        </div>
-        <div class="faq-item">
-          <strong>What should come next?</strong>
-          <span>Server-side enrichment, smoother map rendering, trails, and a more Flightradar-like visualization layer.</span>
-        </div>
-      </div>
+      </aside>
     </div>
   </section>
 
   <footer class="footer">
     <div class="container footer-inner">
       <div>© 2026 SpyAir</div>
-      <div>OSINT air activity monitor</div>
+      <div>FR24-backed OSINT air activity monitor</div>
     </div>
   </footer>
 
@@ -970,8 +673,7 @@
       "RCH", "RRR", "MMF", "NATO", "BAF", "QID", "CNV", "HKY", "ASY",
       "AME", "SHEP", "DUKE", "LAGR", "BRK", "REDEYE", "FORTE", "JAKE",
       "NAVY", "VM", "MC", "RAFAIR", "PACK", "MOOSE", "GAF", "IAF", "CTM",
-      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM",
-      "PLF"
+      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM", "PLF"
     ];
 
     const map = L.map("mapContainer", { zoomControl: true }).setView([52.1, 19.4], 6);
@@ -1015,26 +717,26 @@
     let markerMap = new Map();
     let watchlist = loadWatchlist();
 
-    const allIcon = L.divIcon({
-      html: '<div style="font-size:18px; color:#7dd3fc;">✈️</div>',
-      className: "",
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
-    });
+    function planeDiv(rotation, color, callsign) {
+      return `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="font-size:18px;line-height:1;color:${color};transform:rotate(${rotation}deg);filter:drop-shadow(0 0 6px rgba(0,0,0,0.8));">✈</div>
+          <div class="plane-label">${callsign}</div>
+        </div>
+      `;
+    }
 
-    const militaryIcon = L.divIcon({
-      html: '<div style="font-size:18px; color:#fca5a5;">✈️</div>',
-      className: "",
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
-    });
+    function markerIconFor(flight) {
+      const color = flight.watchHit ? "#86efac" : flight.militaryLikely ? "#fca5a5" : "#7dd3fc";
+      const rotation = Number.isFinite(flight.trueTrack) ? flight.trueTrack : 0;
 
-    const watchIcon = L.divIcon({
-      html: '<div style="font-size:18px; color:#86efac;">✈️</div>',
-      className: "",
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
-    });
+      return L.divIcon({
+        html: planeDiv(rotation, color, flight.callsign),
+        className: "",
+        iconSize: [80, 26],
+        iconAnchor: [16, 13]
+      });
+    }
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -1075,10 +777,8 @@
       if (militaryPrefixes.some(prefix => cs.startsWith(prefix))) return true;
       if (/^\d{2,}$/.test(cs)) return false;
       if (cs.includes("AF") && cs.length <= 8) return true;
-      if (
-        ["UNITED STATES", "UNITED KINGDOM", "FRANCE", "GERMANY", "ITALY", "POLAND"].includes(c) &&
-        /^[A-Z]{2,6}\d{1,4}$/.test(cs)
-      ) return true;
+      if (["UNITED STATES", "UNITED KINGDOM", "FRANCE", "GERMANY", "ITALY", "POLAND"].includes(c) &&
+          /^[A-Z]{2,6}\d{1,4}$/.test(cs)) return true;
 
       return false;
     }
@@ -1175,12 +875,6 @@
       }
 
       alertCount.textContent = alerts.length.toLocaleString();
-    }
-
-    function markerIconFor(flight) {
-      if (flight.watchHit) return watchIcon;
-      if (flight.militaryLikely) return militaryIcon;
-      return allIcon;
     }
 
     function renderMarkers(flights) {
@@ -1399,13 +1093,7 @@
 
       return sortFlights(
         data.flights
-          .filter((f) =>
-            f &&
-            f.lat !== null &&
-            f.lat !== undefined &&
-            f.lon !== null &&
-            f.lon !== undefined
-          )
+          .filter((f) => f && f.lat != null && f.lon != null)
           .map(normalizeFlight)
       );
     }
