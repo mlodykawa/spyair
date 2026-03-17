@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpyAir — OSINT air activity monitor</title>
+  <title>SpyAir — Live aircraft tracking</title>
   <meta
     name="description"
-    content="SpyAir tracks aircraft activity with live data, military-likely filtering, alerts, watchlists, and regional monitoring."
+    content="SpyAir tracks aircraft activity with live FR24-powered data, military-likely filtering, watchlists, and alerts."
   />
-  <meta property="og:title" content="SpyAir — OSINT air activity monitor" />
+  <meta property="og:title" content="SpyAir — Live aircraft tracking" />
   <meta
     property="og:description"
-    content="Live aircraft tracking with military-likely filtering, alerts, watchlists, and regional monitoring."
+    content="Live aircraft tracking with military-likely filtering, watchlists, regional monitoring, and alerts."
   />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#07111f" />
@@ -26,7 +26,6 @@
   <style>
     :root {
       --bg: #07111f;
-      --bg-2: #0b1728;
       --panel: rgba(255,255,255,0.05);
       --panel-2: rgba(255,255,255,0.04);
       --border: rgba(255,255,255,0.10);
@@ -50,13 +49,19 @@
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top right, rgba(125, 211, 252, 0.13), transparent 22%),
-        radial-gradient(circle at 10% 30%, rgba(147, 197, 253, 0.08), transparent 18%),
+        radial-gradient(circle at top right, rgba(125,211,252,0.13), transparent 22%),
+        radial-gradient(circle at 10% 30%, rgba(147,197,253,0.08), transparent 18%),
         linear-gradient(180deg, #05101b 0%, #081321 100%);
     }
 
-    a { color: inherit; text-decoration: none; }
-    button, input { font: inherit; }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button, input {
+      font: inherit;
+    }
 
     .container {
       width: min(var(--max), calc(100% - 32px));
@@ -86,7 +91,9 @@
       letter-spacing: -0.4px;
     }
 
-    .brand span { color: var(--accent); }
+    .brand span {
+      color: var(--accent);
+    }
 
     .nav-links {
       display: flex;
@@ -100,7 +107,9 @@
       font-size: 14px;
     }
 
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover {
+      color: var(--text);
+    }
 
     .btn {
       display: inline-flex;
@@ -122,7 +131,9 @@
       box-shadow: var(--shadow);
     }
 
-    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+    }
 
     .btn-secondary {
       color: var(--text);
@@ -130,7 +141,9 @@
       border-color: var(--border);
     }
 
-    .btn-secondary:hover { background: rgba(255,255,255,0.07); }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.07);
+    }
 
     .hero {
       padding: 72px 0 40px;
@@ -149,8 +162,8 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(125, 211, 252, 0.08);
-      border: 1px solid rgba(125, 211, 252, 0.18);
+      background: rgba(125,211,252,0.08);
+      border: 1px solid rgba(125,211,252,0.18);
       color: var(--accent);
       font-size: 13px;
       margin-bottom: 18px;
@@ -307,7 +320,9 @@
       font-size: 13px;
     }
 
-    section { padding: 42px 0; }
+    section {
+      padding: 42px 0;
+    }
 
     .section-head {
       margin-bottom: 26px;
@@ -657,16 +672,26 @@
     }
 
     @media (max-width: 1180px) {
-      .controls-grid { grid-template-columns: 1fr; }
+      .controls-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 1120px) {
-      .map-grid { grid-template-columns: 1fr; }
-      .list { max-height: 260px; }
+      .map-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .list {
+        max-height: 260px;
+      }
     }
 
     @media (max-width: 980px) {
-      .hero-grid, .cards { grid-template-columns: 1fr; }
+      .hero-grid,
+      .cards {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 760px) {
@@ -683,9 +708,17 @@
         grid-template-columns: 1fr;
       }
 
-      .section-title { font-size: 28px; }
-      h1 { font-size: 42px; }
-      #mapContainer { height: 460px; }
+      .section-title {
+        font-size: 28px;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      #mapContainer {
+        height: 460px;
+      }
     }
   </style>
 </head>
@@ -704,18 +737,18 @@
   <header class="hero">
     <div class="container hero-grid">
       <div class="hero-copy">
-        <div class="eyebrow">OSINT air activity monitor</div>
+        <div class="eyebrow">FR24-powered live prototype</div>
         <h1>Track aircraft activity with real data.</h1>
         <p>
-          SpyAir now combines live air-traffic data, military-likely filtering,
-          watchlists, regional monitoring, and a running alert feed in one interface.
+          SpyAir combines live flight data, military-likely filtering, regional views,
+          watchlists, and a running alert feed in one interface.
         </p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#map">Open live map</a>
           <a class="btn btn-secondary" href="#features">See features</a>
         </div>
         <div class="hero-note">
-          Real API • military-likely filter • watchlists • regions • live alerts
+          Worker API • watchlists • regions • live alerts • fallback mode
         </div>
       </div>
 
@@ -830,9 +863,9 @@
   <section id="features">
     <div class="container">
       <div class="section-head">
-        <h2 class="section-title">What this version does well</h2>
+        <h2 class="section-title">What this version does</h2>
         <p class="section-subtitle">
-          It now behaves like a proper live monitoring prototype instead of a half-loaded page.
+          It behaves like a proper live monitoring prototype and still degrades gracefully if the upstream feed fails.
         </p>
       </div>
 
@@ -841,7 +874,7 @@
           <div class="icon">🛰️</div>
           <h3>Live + fallback mode</h3>
           <p>
-            If the upstream feed fails, SpyAir falls back to demo data instead of looking broken.
+            If the live feed fails, SpyAir falls back to demo data instead of looking broken.
           </p>
         </div>
 
@@ -869,7 +902,7 @@
       <div class="section-head">
         <h2 class="section-title">Important notes</h2>
         <p class="section-subtitle">
-          This version is solid for prototyping, but still heuristic-based.
+          This version is strong for prototyping, but still heuristic-based.
         </p>
       </div>
 
@@ -907,38 +940,34 @@
     const API_BASE = "https://spyair-api.mlodykawa.workers.dev";
 
     const DEMO_FLIGHTS = [
-      { icao24: "demo01", callsign: "RCH102", originCountry: "United States", latitude: 52.21, longitude: 21.01, baroAltitude: 9400, velocity: 225, trueTrack: 110, militaryLikely: true, watchHit: true },
-      { icao24: "demo02", callsign: "FORTE12", originCountry: "United States", latitude: 54.55, longitude: 18.52, baroAltitude: 15100, velocity: 180, trueTrack: 70, militaryLikely: true, watchHit: true },
-      { icao24: "demo03", callsign: "LOT381", originCountry: "Poland", latitude: 50.07, longitude: 19.95, baroAltitude: 10100, velocity: 205, trueTrack: 260, militaryLikely: false, watchHit: false },
-      { icao24: "demo04", callsign: "NATO42", originCountry: "Belgium", latitude: 53.40, longitude: 14.55, baroAltitude: 11600, velocity: 212, trueTrack: 35, militaryLikely: true, watchHit: true },
-      { icao24: "demo05", callsign: "DLH7AB", originCountry: "Germany", latitude: 51.76, longitude: 19.46, baroAltitude: 8800, velocity: 190, trueTrack: 190, militaryLikely: false, watchHit: false }
+      { id: "demo01", callsign: "RCH102", lat: 52.21, lon: 21.01, altitude: 9400, speed: 225, heading: 110, country: "United States" },
+      { id: "demo02", callsign: "FORTE12", lat: 54.55, lon: 18.52, altitude: 15100, speed: 180, heading: 70, country: "United States" },
+      { id: "demo03", callsign: "LOT381", lat: 50.07, lon: 19.95, altitude: 10100, speed: 205, heading: 260, country: "Poland" },
+      { id: "demo04", callsign: "NATO42", lat: 53.40, lon: 14.55, altitude: 11600, speed: 212, heading: 35, country: "Belgium" },
+      { id: "demo05", callsign: "DLH7AB", lat: 51.76, lon: 19.46, altitude: 8800, speed: 190, heading: 190, country: "Germany" }
     ];
 
     const regionConfigs = {
       poland: {
         label: "Poland",
-        bounds: { lamin: 49.0, lamax: 55.0, lomin: 14.0, lomax: 24.5 },
         center: [52.1, 19.4],
         zoom: 6,
         focusBox: { minLat: 49.0, maxLat: 54.9, minLon: 14.0, maxLon: 24.5 }
       },
       baltics: {
         label: "Baltics",
-        bounds: { lamin: 54.0, lamax: 59.8, lomin: 19.0, lomax: 29.5 },
         center: [56.2, 24.7],
         zoom: 6,
         focusBox: { minLat: 54.0, maxLat: 59.8, minLon: 19.0, maxLon: 29.5 }
       },
       blacksea: {
         label: "Black Sea",
-        bounds: { lamin: 40.0, lamax: 47.8, lomin: 27.0, lomax: 42.5 },
         center: [43.2, 34.6],
         zoom: 6,
         focusBox: { minLat: 40.0, maxLat: 47.8, minLon: 27.0, maxLon: 42.5 }
       },
       central: {
         label: "Central Europe",
-        bounds: { lamin: 47.0, lamax: 56.8, lomin: 8.0, lomax: 26.0 },
         center: [51.2, 17.2],
         zoom: 5,
         focusBox: { minLat: 47.0, maxLat: 56.8, minLon: 8.0, maxLon: 26.0 }
@@ -992,7 +1021,6 @@
     let alerts = [];
     let markerMap = new Map();
     let watchlist = loadWatchlist();
-    let usingFallback = false;
 
     const allIcon = L.divIcon({
       html: '<div style="font-size:18px; color:#7dd3fc;">✈️</div>',
@@ -1070,14 +1098,14 @@
 
     function normalizeFlight(raw) {
       const flight = {
-        icao24: raw.icao24,
+        icao24: raw.id || raw.icao24 || raw.callsign || String(Math.random()),
         callsign: raw.callsign || "Unknown",
-        originCountry: raw.originCountry || "Unknown",
-        latitude: raw.latitude,
-        longitude: raw.longitude,
-        baroAltitude: raw.baroAltitude ?? null,
-        velocity: raw.velocity ?? null,
-        trueTrack: raw.trueTrack ?? null
+        originCountry: raw.country || raw.originCountry || "Unknown",
+        latitude: raw.lat ?? raw.latitude,
+        longitude: raw.lon ?? raw.longitude,
+        baroAltitude: raw.altitude ?? raw.baroAltitude ?? null,
+        velocity: raw.speed ?? raw.velocity ?? null,
+        trueTrack: raw.heading ?? raw.trueTrack ?? null
       };
 
       flight.militaryLikely = isMilitaryLikely(flight.callsign, flight.originCountry);
@@ -1359,25 +1387,8 @@
       map.setView(cfg.center, cfg.zoom);
     }
 
-    function normalizeFromApiState(state) {
-      return {
-        icao24: state[0],
-        callsign: (state[1] || "").trim() || "Unknown",
-        originCountry: state[2] || "Unknown",
-        longitude: state[5],
-        latitude: state[6],
-        baroAltitude: state[7],
-        velocity: state[9],
-        trueTrack: state[10]
-      };
-    }
-
     async function fetchFlights() {
-      const cfg = regionConfigs[currentRegion];
-      const b = cfg.bounds;
-      const url = `${API_BASE}/api/states?lamin=${b.lamin}&lamax=${b.lamax}&lomin=${b.lomin}&lomax=${b.lomax}`;
-
-      const response = await fetch(url);
+      const response = await fetch(`${API_BASE}/api/live?region=${currentRegion}`);
       const text = await response.text();
 
       let data;
@@ -1387,14 +1398,19 @@
         throw new Error("Worker returned non-JSON response");
       }
 
-      if (!response.ok || !data.ok || !Array.isArray(data.states)) {
-        throw new Error(data.error || "No valid state data");
+      if (!response.ok || !data.ok || !Array.isArray(data.flights)) {
+        throw new Error(data.error || "No valid flight data");
       }
 
       return sortFlights(
-        data.states
-          .filter((s) => s && s[5] !== null && s[6] !== null && s[8] === false)
-          .map(normalizeFromApiState)
+        data.flights
+          .filter((f) =>
+            f &&
+            f.lat !== null &&
+            f.lat !== undefined &&
+            f.lon !== null &&
+            f.lon !== undefined
+          )
           .map(normalizeFlight)
       );
     }
@@ -1407,7 +1423,6 @@
       mapStatus.textContent = "Refreshing live data…";
 
       try {
-        usingFallback = false;
         modeBadge.textContent = "Mode: Live";
         currentFlights = await fetchFlights();
         detectAlerts(currentFlights);
@@ -1415,7 +1430,6 @@
         mapStatus.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
       } catch (error) {
         console.error(error);
-        usingFallback = true;
         modeBadge.textContent = "Mode: Fallback";
         currentFlights = fallbackFlights();
         detectAlerts(currentFlights);
