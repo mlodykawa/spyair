@@ -6,12 +6,12 @@
   <title>SpyAir — Live aircraft tracking</title>
   <meta
     name="description"
-    content="SpyAir is a live aircraft tracking prototype with military-likely filtering and alerts."
+    content="SpyAir is a live aircraft tracking prototype with military-likely filtering, alerts, watchlists, and regional monitoring."
   />
   <meta property="og:title" content="SpyAir — Live aircraft tracking" />
   <meta
     property="og:description"
-    content="Track aircraft activity in real time with live OpenSky data, military-likely filtering, and alerts."
+    content="Track aircraft activity in real time with live OpenSky data, military-likely filtering, alerts, watchlists, and regions."
   />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#06101c" />
@@ -37,10 +37,11 @@
       --danger: #fca5a5;
       --danger-2: #fecaca;
       --success: #86efac;
+      --success-2: #dcfce7;
       --warning: #fcd34d;
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
       --radius: 22px;
-      --max-width: 1220px;
+      --max-width: 1260px;
     }
 
     * { box-sizing: border-box; }
@@ -61,6 +62,10 @@
       text-decoration: none;
     }
 
+    button, input {
+      font: inherit;
+    }
+
     .container {
       width: min(var(--max-width), calc(100% - 32px));
       margin: 0 auto;
@@ -69,7 +74,7 @@
     .nav {
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 60;
       backdrop-filter: blur(16px);
       background: rgba(6, 16, 28, 0.80);
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
@@ -117,13 +122,15 @@
       justify-content: center;
       gap: 8px;
       border-radius: 14px;
-      padding: 14px 20px;
+      padding: 12px 16px;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1;
       transition: 0.2s ease;
       cursor: pointer;
       border: 1px solid transparent;
+      background: none;
+      color: inherit;
     }
 
     .btn-primary {
@@ -342,7 +349,7 @@
 
     .card-stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
     }
 
@@ -424,11 +431,31 @@
       font-size: 14px;
     }
 
-    .filter-bar {
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .control-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .control-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .filter-bar,
+    .region-bar {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 14px;
     }
 
     .toggle-btn {
@@ -448,15 +475,61 @@
       color: var(--accent);
     }
 
+    .watchlist-input-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .watchlist-input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      outline: none;
+    }
+
+    .watchlist-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .watch-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(134, 239, 172, 0.08);
+      border: 1px solid rgba(134, 239, 172, 0.18);
+      color: var(--success-2);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .watch-tag button {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 0;
+      font-size: 12px;
+    }
+
     .map-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 360px;
+      grid-template-columns: minmax(0, 1fr) 380px;
       gap: 16px;
       align-items: start;
     }
 
     #mapContainer {
-      height: 560px;
+      height: 620px;
       border-radius: 18px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.08);
@@ -490,7 +563,7 @@
     .alert-list {
       display: grid;
       gap: 10px;
-      max-height: 260px;
+      max-height: 280px;
       overflow: auto;
       padding-right: 4px;
     }
@@ -516,6 +589,12 @@
     .alert-item.military {
       border-color: rgba(252, 165, 165, 0.22);
       background: rgba(252, 165, 165, 0.06);
+    }
+
+    .flight-item.watch,
+    .alert-item.watch {
+      border-color: rgba(134, 239, 172, 0.22);
+      background: rgba(134, 239, 172, 0.07);
     }
 
     .alert-item.warning {
@@ -550,6 +629,7 @@
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.12);
       color: var(--muted);
+      white-space: nowrap;
     }
 
     .flight-tag.military,
@@ -557,6 +637,13 @@
       color: var(--danger-2);
       border-color: rgba(252, 165, 165, 0.22);
       background: rgba(252, 165, 165, 0.08);
+    }
+
+    .flight-tag.watch,
+    .alert-tag.watch {
+      color: var(--success-2);
+      border-color: rgba(134, 239, 172, 0.22);
+      background: rgba(134, 239, 172, 0.08);
     }
 
     .alert-tag.warning {
@@ -661,7 +748,13 @@
       min-width: 220px;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1180px) {
+      .controls-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 1120px) {
       .map-grid {
         grid-template-columns: 1fr;
       }
@@ -690,7 +783,7 @@
       }
 
       .card-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
       }
 
       .section-title {
@@ -701,8 +794,12 @@
         font-size: 42px;
       }
 
+      .watchlist-input-row {
+        grid-template-columns: 1fr;
+      }
+
       #mapContainer {
-        height: 420px;
+        height: 460px;
       }
     }
   </style>
@@ -722,18 +819,18 @@
   <header class="hero" id="top">
     <div class="container hero-grid">
       <div class="hero-copy">
-        <div class="eyebrow">Live OpenSky integration + alerts</div>
+        <div class="eyebrow">Live OpenSky integration + alerts + watchlists</div>
         <h1>Track aircraft activity with real data.</h1>
         <p>
           SpyAir now loads real aircraft positions, highlights military-likely traffic,
-          and generates basic live alerts when interesting movement appears.
+          supports watchlists, regional views, and generates live alerts when notable movement appears.
         </p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#map">Open live map</a>
           <a class="btn btn-secondary" href="#features">See what changed</a>
         </div>
         <div class="hero-note">
-          Real API • military-likely filter • live alerts • activity panel
+          Real API • military-likely filter • watchlists • regions • live alerts
         </div>
       </div>
 
@@ -764,6 +861,10 @@
             <span>Military-likely</span>
           </div>
           <div class="stat">
+            <strong id="watchCount">0</strong>
+            <span>Watchlist hits</span>
+          </div>
+          <div class="stat">
             <strong id="alertCount">0</strong>
             <span>Recent alerts</span>
           </div>
@@ -777,7 +878,7 @@
       <div class="section-head">
         <h2 class="section-title">Live aircraft map</h2>
         <p class="section-subtitle">
-          Real aircraft state vectors over Poland and nearby airspace, with military-likely filtering and alerts.
+          Real aircraft state vectors with military-likely filtering, watchlists, regional monitoring, and alerts.
         </p>
       </div>
 
@@ -785,15 +886,41 @@
         <div class="map-topbar">
           <div class="map-badges">
             <div class="map-badge">OpenSky API</div>
-            <div class="map-badge">Bounding box</div>
             <div class="map-badge">Auto refresh</div>
+            <div class="map-badge" id="regionBadge">Region: Poland</div>
           </div>
           <div class="status" id="mapStatus">Loading live data…</div>
         </div>
 
-        <div class="filter-bar">
-          <button class="toggle-btn active" id="showAllBtn" type="button">All aircraft</button>
-          <button class="toggle-btn" id="showMilitaryBtn" type="button">Military-likely only</button>
+        <div class="controls-grid">
+          <div class="control-card">
+            <div class="control-title">Traffic filters</div>
+            <div class="filter-bar">
+              <button class="toggle-btn active" id="showAllBtn" type="button">All aircraft</button>
+              <button class="toggle-btn" id="showMilitaryBtn" type="button">Military-likely only</button>
+              <button class="toggle-btn" id="showWatchBtn" type="button">Watchlist hits only</button>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <div class="control-title">Regions</div>
+            <div class="region-bar">
+              <button class="toggle-btn active region-btn" data-region="poland" type="button">Poland</button>
+              <button class="toggle-btn region-btn" data-region="baltics" type="button">Baltics</button>
+              <button class="toggle-btn region-btn" data-region="blacksea" type="button">Black Sea</button>
+              <button class="toggle-btn region-btn" data-region="central" type="button">Central Europe</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-card" style="margin-bottom:14px;">
+          <div class="control-title">Watchlist</div>
+          <div class="watchlist-input-row">
+            <input id="watchInput" class="watchlist-input" type="text" placeholder="Add callsign prefix, e.g. RCH, FORTE, NATO" />
+            <button id="addWatchBtn" class="btn btn-primary" type="button">Add</button>
+            <button id="clearWatchBtn" class="btn btn-secondary" type="button">Clear all</button>
+          </div>
+          <div class="watchlist-tags" id="watchTags"></div>
         </div>
 
         <div class="map-grid">
@@ -803,6 +930,9 @@
             <div class="panel-card">
               <div class="panel-title">Live alerts</div>
               <div class="panel-sub" id="alertSubtitle">Watching for military-likely activity…</div>
+              <div style="margin-bottom:10px;">
+                <button id="exportAlertsBtn" class="btn btn-secondary" type="button">Export alerts</button>
+              </div>
               <div class="alert-list" id="alertList"></div>
             </div>
 
@@ -822,32 +952,32 @@
       <div class="section-head">
         <h2 class="section-title">What changed in this version</h2>
         <p class="section-subtitle">
-          This version starts acting like a monitoring tool, not just a map.
+          This is now much closer to an actual OSINT monitoring dashboard.
         </p>
       </div>
 
       <div class="grid-3">
         <div class="card">
-          <div class="icon">🚨</div>
-          <h3>Live alert feed</h3>
-          <p>
-            SpyAir now logs notable events like new military-likely traffic, entries into Poland, and disappearances.
-          </p>
-        </div>
-
-        <div class="card">
-          <div class="icon">🛡️</div>
-          <h3>Military-likely prioritization</h3>
-          <p>
-            Aircraft with military-style callsigns are highlighted and pushed to the top of the activity feed.
-          </p>
-        </div>
-
-        <div class="card">
           <div class="icon">📍</div>
-          <h3>Clickable activity workflow</h3>
+          <h3>Regional views</h3>
           <p>
-            Click any item in the flight list and jump directly to that aircraft on the map.
+            Switch between Poland, Baltics, Black Sea, and Central Europe without rewriting code.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="icon">✅</div>
+          <h3>Watchlist logic</h3>
+          <p>
+            Add callsign prefixes like RCH, FORTE, NATO, or ASCOT and highlight matching flights automatically.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="icon">🚨</div>
+          <h3>Useful alert feed</h3>
+          <p>
+            New flights, watchlist hits, military-likely entries, and disappearances now appear in a running activity log.
           </p>
         </div>
       </div>
@@ -859,22 +989,22 @@
       <div class="section-head">
         <h2 class="section-title">Important notes</h2>
         <p class="section-subtitle">
-          This is already useful, but still heuristic-based.
+          This version is strong for prototyping, but still heuristic-based.
         </p>
       </div>
 
       <div class="faq">
         <div class="faq-item">
-          <strong>Are alerts exact military detections?</strong>
-          <span>No. They are based on a first military-likely ruleset, mainly from callsign patterns and position changes.</span>
+          <strong>Is this a precise military detector?</strong>
+          <span>No. It uses first-pass rules, watchlist patterns, and movement context. It is useful for spotting likely activity, not as a final ground-truth classifier.</span>
         </div>
         <div class="faq-item">
-          <strong>What should come next?</strong>
-          <span>Next step is stronger classification, watchlists, geofences, and a backend alert engine.</span>
+          <strong>What should come next after this?</strong>
+          <span>The next real milestone is moving API calls behind a backend or Cloudflare Worker, then adding historical storage, better watchlists, and persistent alerts.</span>
         </div>
         <div class="faq-item">
-          <strong>Why is this valuable already?</strong>
-          <span>Because now you can see live traffic, isolate interesting flights, and watch a running feed of activity changes.</span>
+          <strong>Why is this already valuable?</strong>
+          <span>Because you now have live data, filtering, regional switching, watchlists, and an event log in one working interface.</span>
         </div>
       </div>
     </div>
@@ -905,35 +1035,74 @@
     const mapStatus = document.getElementById("mapStatus");
     const aircraftCount = document.getElementById("aircraftCount");
     const militaryCount = document.getElementById("militaryCount");
+    const watchCount = document.getElementById("watchCount");
     const alertCount = document.getElementById("alertCount");
+    const regionBadge = document.getElementById("regionBadge");
+
     const flightList = document.getElementById("flightList");
     const alertList = document.getElementById("alertList");
     const panelSubtitle = document.getElementById("panelSubtitle");
     const alertSubtitle = document.getElementById("alertSubtitle");
+
     const showAllBtn = document.getElementById("showAllBtn");
     const showMilitaryBtn = document.getElementById("showMilitaryBtn");
+    const showWatchBtn = document.getElementById("showWatchBtn");
+    const regionButtons = document.querySelectorAll(".region-btn");
+
+    const watchInput = document.getElementById("watchInput");
+    const addWatchBtn = document.getElementById("addWatchBtn");
+    const clearWatchBtn = document.getElementById("clearWatchBtn");
+    const watchTags = document.getElementById("watchTags");
+    const exportAlertsBtn = document.getElementById("exportAlertsBtn");
 
     const markersLayer = L.layerGroup().addTo(map);
 
-    const bounds = {
-      lamin: 48.5,
-      lamax: 56.5,
-      lomin: 13.0,
-      lomax: 25.0
+    const regionConfigs = {
+      poland: {
+        label: "Poland",
+        bounds: { lamin: 49.0, lamax: 55.0, lomin: 14.0, lomax: 24.5 },
+        center: [52.1, 19.4],
+        zoom: 6,
+        focusCountryBox: { minLat: 49.0, maxLat: 54.9, minLon: 14.0, maxLon: 24.5 }
+      },
+      baltics: {
+        label: "Baltics",
+        bounds: { lamin: 54.0, lamax: 59.8, lomin: 19.0, lomax: 29.5 },
+        center: [56.2, 24.7],
+        zoom: 6,
+        focusCountryBox: { minLat: 54.0, maxLat: 59.8, minLon: 19.0, maxLon: 29.5 }
+      },
+      blacksea: {
+        label: "Black Sea",
+        bounds: { lamin: 40.0, lamax: 47.8, lomin: 27.0, lomax: 42.5 },
+        center: [43.2, 34.6],
+        zoom: 6,
+        focusCountryBox: { minLat: 40.0, maxLat: 47.8, minLon: 27.0, maxLon: 42.5 }
+      },
+      central: {
+        label: "Central Europe",
+        bounds: { lamin: 47.0, lamax: 56.8, lomin: 8.0, lomax: 26.0 },
+        center: [51.2, 17.2],
+        zoom: 5,
+        focusCountryBox: { minLat: 47.0, maxLat: 56.8, minLon: 8.0, maxLon: 26.0 }
+      }
     };
 
-    const polandBounds = {
-      minLat: 49.0,
-      maxLat: 54.9,
-      minLon: 14.0,
-      maxLon: 24.5
-    };
+    const militaryPrefixes = [
+      "RCH", "RRR", "MMF", "NATO", "BAF", "QID", "CNV", "HKY", "ASY",
+      "AME", "SHEP", "DUKE", "LAGR", "BRK", "REDEYE", "FORTE", "JAKE",
+      "NAVY", "VM", "MC", "RAFAIR", "PACK", "MOOSE", "GAF", "IAF", "CTM",
+      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF", "SAM",
+      "TARTN", "GRIM", "PITOT", "NCHO", "HOMER", "LOON", "BART"
+    ];
 
     let currentFilter = "all";
+    let currentRegion = "poland";
     let currentFlights = [];
     let markerMap = new Map();
     let previousFlights = new Map();
     let alerts = [];
+    let watchlist = loadWatchlist();
 
     const allIcon = L.divIcon({
       html: '<div style="font-size:18px; color:#7dd3fc;">✈️</div>',
@@ -949,12 +1118,12 @@
       iconAnchor: [12, 12]
     });
 
-    const militaryPrefixes = [
-      "RCH", "RRR", "MMF", "NATO", "BAF", "QID", "CNV", "HKY", "ASY",
-      "AME", "SHEP", "DUKE", "LAGR", "BRK", "REDEYE", "FORTE", "JAKE",
-      "NAVY", "VM", "MC", "RAFAIR", "PACK", "MOOSE", "GAF", "IAF", "CTM",
-      "ADB", "HERKY", "ROYAL", "ASCOT", "CFC", "KRF", "EEF", "FAF"
-    ];
+    const watchIcon = L.divIcon({
+      html: '<div style="font-size:18px; color:#86efac;">✈️</div>',
+      className: "",
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -978,12 +1147,17 @@
       return text || fallback;
     }
 
-    function isInsidePoland(lat, lon) {
+    function currentFocusBox() {
+      return regionConfigs[currentRegion].focusCountryBox;
+    }
+
+    function isInsideFocus(lat, lon) {
+      const box = currentFocusBox();
       return (
-        lat >= polandBounds.minLat &&
-        lat <= polandBounds.maxLat &&
-        lon >= polandBounds.minLon &&
-        lon <= polandBounds.maxLon
+        lat >= box.minLat &&
+        lat <= box.maxLat &&
+        lon >= box.minLon &&
+        lon <= box.maxLon
       );
     }
 
@@ -1015,6 +1189,12 @@
       return false;
     }
 
+    function isWatchlistHit(callsign) {
+      const cs = String(callsign || "").trim().toUpperCase();
+      if (!cs) return false;
+      return watchlist.some(prefix => cs.startsWith(prefix));
+    }
+
     function normalizeFlight(s) {
       const icao24 = s[0];
       const callsign = (s[1] || "").trim();
@@ -1037,15 +1217,15 @@
         trueTrack,
         onGround,
         militaryLikely: isMilitaryLikely(callsign, originCountry),
-        insidePoland: isInsidePoland(latitude, longitude)
+        insideFocus: isInsideFocus(latitude, longitude),
+        watchHit: isWatchlistHit(callsign)
       };
     }
 
     function sortFlights(flights) {
       return [...flights].sort((a, b) => {
-        if (a.militaryLikely !== b.militaryLikely) {
-          return a.militaryLikely ? -1 : 1;
-        }
+        if (a.watchHit !== b.watchHit) return a.watchHit ? -1 : 1;
+        if (a.militaryLikely !== b.militaryLikely) return a.militaryLikely ? -1 : 1;
         return (b.velocity || 0) - (a.velocity || 0);
       });
     }
@@ -1058,8 +1238,7 @@
         type,
         time: new Date().toLocaleTimeString()
       });
-
-      alerts = alerts.slice(0, 25);
+      alerts = alerts.slice(0, 40);
       renderAlerts();
     }
 
@@ -1090,6 +1269,10 @@
           cls += " success";
           tagCls += " success";
           tagText = "new";
+        } else if (alert.type === "watch") {
+          cls += " watch";
+          tagCls += " watch";
+          tagText = "watch";
         }
 
         item.className = cls;
@@ -1109,6 +1292,12 @@
       alertCount.textContent = alerts.length.toLocaleString();
     }
 
+    function getMarkerIcon(flight) {
+      if (flight.watchHit) return watchIcon;
+      if (flight.militaryLikely) return militaryIcon;
+      return allIcon;
+    }
+
     function renderMarkers(flights) {
       markersLayer.clearLayers();
       markerMap.clear();
@@ -1116,7 +1305,7 @@
       flights.forEach((flight) => {
         const marker = L.marker(
           [flight.latitude, flight.longitude],
-          { icon: flight.militaryLikely ? militaryIcon : allIcon }
+          { icon: getMarkerIcon(flight) }
         );
 
         marker.bindPopup(`
@@ -1127,8 +1316,8 @@
             Altitude: ${escapeHtml(formatAlt(flight.baroAltitude))}<br />
             Speed: ${escapeHtml(formatSpeed(flight.velocity))}<br />
             Track: ${flight.trueTrack !== null && flight.trueTrack !== undefined ? Math.round(flight.trueTrack) + "°" : "Unknown"}<br />
-            Poland: ${flight.insidePoland ? "Inside" : "Outside"}<br />
-            Flag: ${flight.militaryLikely ? "Military-likely" : "General traffic"}
+            Region: ${flight.insideFocus ? "Inside focus region" : "Outside"}<br />
+            Flag: ${flight.watchHit ? "Watchlist hit" : flight.militaryLikely ? "Military-likely" : "General traffic"}
           </div>
         `);
 
@@ -1145,21 +1334,32 @@
         return;
       }
 
-      flights.slice(0, 80).forEach((flight) => {
+      flights.slice(0, 100).forEach((flight) => {
         const item = document.createElement("div");
-        item.className = "flight-item" + (flight.militaryLikely ? " military" : "");
+        let cls = "flight-item";
+        if (flight.watchHit) cls += " watch";
+        else if (flight.militaryLikely) cls += " military";
+        item.className = cls;
+
+        let tagClass = "flight-tag";
+        let tagText = "general";
+        if (flight.watchHit) {
+          tagClass += " watch";
+          tagText = "watch";
+        } else if (flight.militaryLikely) {
+          tagClass += " military";
+          tagText = "military";
+        }
 
         item.innerHTML = `
           <div class="flight-top">
             <div class="flight-callsign">${escapeHtml(shortValue(flight.callsign))}</div>
-            <div class="flight-tag ${flight.militaryLikely ? "military" : ""}">
-              ${flight.militaryLikely ? "military-likely" : "general"}
-            </div>
+            <div class="${tagClass}">${escapeHtml(tagText)}</div>
           </div>
           <div class="flight-meta">
             ${escapeHtml(shortValue(flight.originCountry))}<br />
             ${escapeHtml(formatAlt(flight.baroAltitude))} • ${escapeHtml(formatSpeed(flight.velocity))}<br />
-            ${flight.insidePoland ? "Inside Poland" : "Outside Poland"}
+            ${flight.insideFocus ? "Inside focus region" : "Outside focus region"}
           </div>
         `;
 
@@ -1176,18 +1376,28 @@
     }
 
     function applyCurrentFilter() {
-      const filtered = currentFilter === "military"
-        ? currentFlights.filter(f => f.militaryLikely)
-        : currentFlights;
+      let filtered = currentFlights;
+
+      if (currentFilter === "military") {
+        filtered = filtered.filter(f => f.militaryLikely);
+      } else if (currentFilter === "watch") {
+        filtered = filtered.filter(f => f.watchHit);
+      }
 
       renderMarkers(filtered);
       renderList(filtered);
 
       aircraftCount.textContent = filtered.length.toLocaleString();
       militaryCount.textContent = currentFlights.filter(f => f.militaryLikely).length.toLocaleString();
-      panelSubtitle.textContent = currentFilter === "military"
-        ? "Showing military-likely flights only"
-        : "Showing all currently visible flights";
+      watchCount.textContent = currentFlights.filter(f => f.watchHit).length.toLocaleString();
+
+      if (currentFilter === "military") {
+        panelSubtitle.textContent = "Showing military-likely flights only";
+      } else if (currentFilter === "watch") {
+        panelSubtitle.textContent = "Showing watchlist hits only";
+      } else {
+        panelSubtitle.textContent = "Showing all currently visible flights";
+      }
     }
 
     function detectAlerts(newFlights) {
@@ -1196,28 +1406,50 @@
       for (const flight of newFlights) {
         const prev = previousFlights.get(flight.icao24);
 
-        if (!prev && flight.militaryLikely) {
+        if (!prev && flight.watchHit) {
           addAlert(
-            `New military-likely flight`,
-            `${flight.callsign} appeared in the monitored area.`,
+            "Watchlist hit appeared",
+            `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`,
+            "watch"
+          );
+        }
+
+        if (!prev && flight.militaryLikely && !flight.watchHit) {
+          addAlert(
+            "New military-likely flight",
+            `${flight.callsign} appeared in ${regionConfigs[currentRegion].label}.`,
             "success"
           );
         }
 
-        if (prev && !prev.insidePoland && flight.insidePoland && flight.militaryLikely) {
+        if (prev && !prev.insideFocus && flight.insideFocus && flight.militaryLikely) {
           addAlert(
-            `Military-likely entered Poland`,
-            `${flight.callsign} crossed into the Poland area.`,
+            "Military-likely entered focus region",
+            `${flight.callsign} moved into ${regionConfigs[currentRegion].label}.`,
             "military"
+          );
+        }
+
+        if (prev && !prev.watchHit && flight.watchHit) {
+          addAlert(
+            "Watchlist matched",
+            `${flight.callsign} now matches your watchlist.`,
+            "watch"
           );
         }
       }
 
       for (const [icao24, prev] of previousFlights.entries()) {
-        if (!nextMap.has(icao24) && prev.militaryLikely) {
+        if (!nextMap.has(icao24) && prev.watchHit) {
           addAlert(
-            `Military-likely disappeared`,
-            `${prev.callsign} is no longer visible in the monitored area.`,
+            "Watchlist flight disappeared",
+            `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`,
+            "warning"
+          );
+        } else if (!nextMap.has(icao24) && prev.militaryLikely) {
+          addAlert(
+            "Military-likely disappeared",
+            `${prev.callsign} is no longer visible in ${regionConfigs[currentRegion].label}.`,
             "warning"
           );
         }
@@ -1229,8 +1461,70 @@
         : "Watching for military-likely activity…";
     }
 
+    function saveWatchlist() {
+      localStorage.setItem("spyair_watchlist", JSON.stringify(watchlist));
+    }
+
+    function loadWatchlist() {
+      try {
+        const raw = localStorage.getItem("spyair_watchlist");
+        const parsed = raw ? JSON.parse(raw) : ["RCH", "FORTE", "NATO", "ASCOT"];
+        return Array.isArray(parsed) ? parsed.map(v => String(v).toUpperCase()) : ["RCH", "FORTE", "NATO", "ASCOT"];
+      } catch {
+        return ["RCH", "FORTE", "NATO", "ASCOT"];
+      }
+    }
+
+    function renderWatchlist() {
+      watchTags.innerHTML = "";
+      if (!watchlist.length) {
+        watchTags.innerHTML = '<span class="flight-meta">No watchlist prefixes yet.</span>';
+        return;
+      }
+
+      watchlist.forEach((tag) => {
+        const el = document.createElement("span");
+        el.className = "watch-tag";
+        el.innerHTML = `${escapeHtml(tag)} <button type="button" data-tag="${escapeHtml(tag)}">✕</button>`;
+        watchTags.appendChild(el);
+      });
+
+      watchTags.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tag = btn.getAttribute("data-tag");
+          watchlist = watchlist.filter(v => v !== tag);
+          saveWatchlist();
+          renderWatchlist();
+          refreshDerivedFlags();
+          applyCurrentFilter();
+        });
+      });
+    }
+
+    function refreshDerivedFlags() {
+      currentFlights = currentFlights.map(f => ({
+        ...f,
+        watchHit: isWatchlistHit(f.callsign)
+      }));
+      currentFlights = sortFlights(currentFlights);
+    }
+
+    function normalizeRegionButtons() {
+      regionButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.region === currentRegion);
+      });
+      regionBadge.textContent = `Region: ${regionConfigs[currentRegion].label}`;
+    }
+
+    function setMapToRegion() {
+      const cfg = regionConfigs[currentRegion];
+      map.setView(cfg.center, cfg.zoom);
+    }
+
     async function loadAircraft() {
-      const url = `https://opensky-network.org/api/states/all?lamin=${bounds.lamin}&lamax=${bounds.lamax}&lomin=${bounds.lomin}&lomax=${bounds.lomax}`;
+      const cfg = regionConfigs[currentRegion];
+      const b = cfg.bounds;
+      const url = `https://opensky-network.org/api/states/all?lamin=${b.lamin}&lamax=${b.lamax}&lomin=${b.lomin}&lomax=${b.lomax}`;
       mapStatus.textContent = "Refreshing live data…";
 
       try {
@@ -1263,10 +1557,38 @@
       }
     }
 
+    function addWatchPrefix() {
+      const value = watchInput.value.trim().toUpperCase();
+      if (!value) return;
+      if (!watchlist.includes(value)) {
+        watchlist.push(value);
+        watchlist = watchlist.sort();
+        saveWatchlist();
+        renderWatchlist();
+        refreshDerivedFlags();
+        applyCurrentFilter();
+        addAlert("Watchlist updated", `Added ${value} to the watchlist.`, "watch");
+      }
+      watchInput.value = "";
+    }
+
+    function exportAlerts() {
+      const blob = new Blob([JSON.stringify(alerts, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `spyair-alerts-${new Date().toISOString().replaceAll(":", "-")}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
     showAllBtn.addEventListener("click", () => {
       currentFilter = "all";
       showAllBtn.classList.add("active");
       showMilitaryBtn.classList.remove("active");
+      showWatchBtn.classList.remove("active");
       applyCurrentFilter();
     });
 
@@ -1274,10 +1596,51 @@
       currentFilter = "military";
       showMilitaryBtn.classList.add("active");
       showAllBtn.classList.remove("active");
+      showWatchBtn.classList.remove("active");
       applyCurrentFilter();
     });
 
+    showWatchBtn.addEventListener("click", () => {
+      currentFilter = "watch";
+      showWatchBtn.classList.add("active");
+      showAllBtn.classList.remove("active");
+      showMilitaryBtn.classList.remove("active");
+      applyCurrentFilter();
+    });
+
+    regionButtons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        currentRegion = btn.dataset.region;
+        previousFlights = new Map();
+        normalizeRegionButtons();
+        setMapToRegion();
+        await loadAircraft();
+      });
+    });
+
+    addWatchBtn.addEventListener("click", addWatchPrefix);
+    watchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addWatchPrefix();
+      }
+    });
+
+    clearWatchBtn.addEventListener("click", () => {
+      watchlist = [];
+      saveWatchlist();
+      renderWatchlist();
+      refreshDerivedFlags();
+      applyCurrentFilter();
+      addAlert("Watchlist cleared", "All watchlist prefixes were removed.", "warning");
+    });
+
+    exportAlertsBtn.addEventListener("click", exportAlerts);
+
     renderAlerts();
+    renderWatchlist();
+    normalizeRegionButtons();
+    setMapToRegion();
     loadAircraft();
     setInterval(loadAircraft, 20000);
   </script>
