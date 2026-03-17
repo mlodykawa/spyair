@@ -10,16 +10,20 @@
   />
   <style>
     :root {
-      --bg: #07111f;
-      --bg-soft: #0d1a2b;
+      --bg: #06101c;
+      --bg-soft: #0c1828;
       --card: rgba(255, 255, 255, 0.06);
-      --border: rgba(255, 255, 255, 0.12);
-      --text: #f4f7fb;
-      --muted: #a9b6c8;
+      --card-strong: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f3f7fc;
+      --muted: #9fb0c7;
       --accent: #7dd3fc;
       --accent-2: #93c5fd;
       --success: #86efac;
+      --danger: #fca5a5;
       --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --radius: 22px;
+      --max: 1160px;
     }
 
     * {
@@ -33,11 +37,11 @@
     body {
       margin: 0;
       font-family: Inter, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(125, 211, 252, 0.14), transparent 25%),
-        radial-gradient(circle at left center, rgba(147, 197, 253, 0.08), transparent 20%),
-        linear-gradient(180deg, #06101c 0%, #091424 100%);
       color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(125, 211, 252, 0.16), transparent 24%),
+        radial-gradient(circle at 10% 30%, rgba(147, 197, 253, 0.08), transparent 18%),
+        linear-gradient(180deg, #05101b 0%, #081321 100%);
     }
 
     a {
@@ -46,30 +50,31 @@
     }
 
     .container {
-      width: min(1120px, calc(100% - 32px));
+      width: min(var(--max), calc(100% - 32px));
       margin: 0 auto;
     }
 
     .nav {
       position: sticky;
       top: 0;
-      z-index: 20;
-      backdrop-filter: blur(14px);
-      background: rgba(7, 17, 31, 0.75);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 30;
+      backdrop-filter: blur(16px);
+      background: rgba(6, 16, 28, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     }
 
     .nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 20px;
       padding: 16px 0;
     }
 
     .brand {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 800;
-      letter-spacing: 0.2px;
+      letter-spacing: -0.3px;
     }
 
     .brand span {
@@ -78,13 +83,15 @@
 
     .nav-links {
       display: flex;
-      gap: 18px;
+      gap: 20px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .nav-links a {
       color: var(--muted);
       font-size: 14px;
+      transition: 0.2s ease;
     }
 
     .nav-links a:hover {
@@ -97,16 +104,17 @@
       justify-content: center;
       gap: 8px;
       padding: 14px 20px;
-      border-radius: 12px;
-      border: 1px solid transparent;
+      border-radius: 14px;
       font-weight: 700;
+      border: 1px solid transparent;
       transition: 0.2s ease;
       cursor: pointer;
+      font-size: 15px;
     }
 
     .btn-primary {
+      color: #06101c;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #05101d;
       box-shadow: var(--shadow);
     }
 
@@ -116,13 +124,13 @@
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.04);
       border-color: var(--border);
       color: var(--text);
     }
 
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.07);
     }
 
     .hero {
@@ -131,8 +139,8 @@
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 36px;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 34px;
       align-items: center;
     }
 
@@ -140,44 +148,44 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(125, 211, 252, 0.08);
-      color: var(--accent);
-      border: 1px solid rgba(125, 211, 252, 0.18);
       padding: 8px 12px;
       border-radius: 999px;
+      background: rgba(125, 211, 252, 0.08);
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      color: var(--accent);
       font-size: 13px;
       margin-bottom: 18px;
     }
 
     h1 {
-      font-size: clamp(40px, 6vw, 68px);
-      line-height: 1.02;
       margin: 0 0 18px;
+      font-size: clamp(40px, 6vw, 70px);
+      line-height: 1.02;
       letter-spacing: -1.4px;
     }
 
-    .hero p {
+    .hero-copy p {
       color: var(--muted);
       font-size: 19px;
-      line-height: 1.7;
-      max-width: 650px;
-      margin: 0 0 28px;
+      line-height: 1.75;
+      margin: 0 0 26px;
+      max-width: 680px;
     }
 
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 14px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
-    .mini-note {
+    .hero-note {
       color: var(--muted);
       font-size: 14px;
     }
 
     .hero-card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 22px;
@@ -189,73 +197,167 @@
     .hero-card::after {
       content: "";
       position: absolute;
-      inset: auto -40px -40px auto;
+      right: -40px;
+      bottom: -40px;
       width: 180px;
       height: 180px;
-      background: radial-gradient(circle, rgba(125, 211, 252, 0.18), transparent 65%);
+      background: radial-gradient(circle, rgba(125, 211, 252, 0.16), transparent 65%);
       pointer-events: none;
     }
 
-    .map-box {
-      background: linear-gradient(180deg, #081321, #0d1b2c);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      height: 260px;
+    .radar {
       position: relative;
+      height: 300px;
+      border-radius: 20px;
       overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background:
+        radial-gradient(circle at center, rgba(125, 211, 252, 0.08), transparent 55%),
+        linear-gradient(180deg, #071220, #0b1828);
       margin-bottom: 18px;
     }
 
-    .grid-lines {
+    .grid {
       position: absolute;
       inset: 0;
       background-image:
         linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-      opacity: 0.5;
+      background-size: 42px 42px;
+      opacity: 0.55;
     }
 
-    .flight-line {
+    .ring,
+    .ring::before,
+    .ring::after {
       position: absolute;
+      inset: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(125, 211, 252, 0.12);
+      content: "";
+    }
+
+    .ring {
+      width: 90px;
+      height: 90px;
+    }
+
+    .ring::before {
+      width: 170px;
+      height: 170px;
+    }
+
+    .ring::after {
+      width: 250px;
+      height: 250px;
+    }
+
+    .sweep {
+      position: absolute;
+      inset: 50%;
       width: 180px;
+      height: 180px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: conic-gradient(
+        from 280deg,
+        rgba(125, 211, 252, 0) 0deg,
+        rgba(125, 211, 252, 0.05) 260deg,
+        rgba(125, 211, 252, 0.34) 320deg,
+        rgba(125, 211, 252, 0) 360deg
+      );
+      animation: spin 8s linear infinite;
+      filter: blur(1px);
+    }
+
+    @keyframes spin {
+      to {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    .cross-x,
+    .cross-y {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .cross-x {
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      transform: translateY(-50%);
+    }
+
+    .cross-y {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+      transform: translateX(-50%);
+    }
+
+    .track {
+      position: absolute;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      top: 90px;
-      left: 70px;
+      opacity: 0.95;
+    }
+
+    .track.one {
+      width: 170px;
+      top: 102px;
+      left: 80px;
       transform: rotate(18deg);
-      opacity: 0.9;
     }
 
-    .flight-line.two {
+    .track.two {
       width: 140px;
-      top: 150px;
-      left: 160px;
-      transform: rotate(-24deg);
+      top: 176px;
+      left: 180px;
+      transform: rotate(-26deg);
     }
 
-    .dot {
+    .plane {
       position: absolute;
-      width: 10px;
-      height: 10px;
+      font-size: 18px;
+      filter: drop-shadow(0 0 10px rgba(125, 211, 252, 0.35));
+    }
+
+    .plane.one {
+      top: 90px;
+      left: 210px;
+      transform: rotate(18deg);
+    }
+
+    .plane.two {
+      top: 165px;
+      left: 250px;
+      transform: rotate(-26deg);
+    }
+
+    .ping {
+      position: absolute;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: var(--accent);
       box-shadow: 0 0 0 8px rgba(125, 211, 252, 0.12);
     }
 
-    .dot.one { top: 84px; left: 214px; }
-    .dot.two { top: 143px; left: 232px; }
-
-    .plane {
-      position: absolute;
-      font-size: 18px;
-      filter: drop-shadow(0 0 12px rgba(125, 211, 252, 0.35));
+    .ping.one {
+      top: 96px;
+      left: 228px;
     }
 
-    .plane.one { top: 72px; left: 205px; transform: rotate(18deg); }
-    .plane.two { top: 131px; left: 224px; transform: rotate(-24deg); }
+    .ping.two {
+      top: 170px;
+      left: 266px;
+    }
 
-    .stats {
+    .card-stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
@@ -280,23 +382,27 @@
     }
 
     section {
-      padding: 40px 0;
+      padding: 42px 0;
+    }
+
+    .section-head {
+      margin-bottom: 28px;
     }
 
     .section-title {
-      font-size: 34px;
       margin: 0 0 10px;
+      font-size: 34px;
       letter-spacing: -0.6px;
     }
 
     .section-subtitle {
       color: var(--muted);
-      max-width: 720px;
-      line-height: 1.7;
-      margin: 0 0 28px;
+      max-width: 760px;
+      line-height: 1.75;
+      margin: 0;
     }
 
-    .cards {
+    .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
@@ -305,12 +411,12 @@
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: var(--radius);
       padding: 22px;
       box-shadow: var(--shadow);
     }
 
-    .card-icon {
+    .card .icon {
       font-size: 28px;
       margin-bottom: 14px;
     }
@@ -323,56 +429,176 @@
     .card p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.75;
       font-size: 15px;
     }
 
-    .feature-list {
+    .use-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
-      margin-top: 10px;
     }
 
-    .feature-item {
+    .use-item {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 16px;
     }
 
-    .feature-item strong {
+    .use-item strong {
       display: block;
       margin-bottom: 6px;
+      font-size: 16px;
     }
 
-    .feature-item span {
+    .use-item span {
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .step-number {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      background: rgba(125, 211, 252, 0.12);
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .step h4 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .price-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .price-card.featured {
+      border-color: rgba(125, 211, 252, 0.3);
+      background: linear-gradient(180deg, rgba(125, 211, 252, 0.1), rgba(255,255,255,0.04));
+    }
+
+    .price-card h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .price-tag {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+
+    .price-sub {
+      color: var(--muted);
+      margin: 0 0 18px;
+      font-size: 14px;
+    }
+
+    .price-list {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .price-item {
       color: var(--muted);
       font-size: 14px;
       line-height: 1.6;
+      padding-left: 18px;
+      position: relative;
+    }
+
+    .price-item::before {
+      content: "•";
+      color: var(--accent);
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .faq {
+      display: grid;
+      gap: 14px;
+    }
+
+    .faq-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .faq-item strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .faq-item span {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
     }
 
     .waitlist {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns: 1.08fr 0.92fr;
       gap: 20px;
       align-items: center;
-      background: linear-gradient(180deg, rgba(125, 211, 252, 0.08), rgba(255,255,255,0.03));
-      border: 1px solid rgba(125, 211, 252, 0.14);
+      background: linear-gradient(180deg, rgba(125, 211, 252, 0.09), rgba(255,255,255,0.03));
+      border: 1px solid rgba(125, 211, 252, 0.15);
       border-radius: 24px;
       padding: 28px;
       box-shadow: var(--shadow);
     }
 
     .waitlist h3 {
-      font-size: 30px;
       margin: 0 0 10px;
+      font-size: 31px;
     }
 
     .waitlist p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.75;
     }
 
     .waitlist-form {
@@ -386,11 +612,12 @@
       flex: 1 1 240px;
       min-width: 220px;
       padding: 15px 16px;
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.05);
       color: var(--text);
       outline: none;
+      font-size: 15px;
     }
 
     .waitlist-form input::placeholder {
@@ -398,25 +625,28 @@
     }
 
     .footer {
-      padding: 28px 0 46px;
+      padding: 30px 0 46px;
       color: var(--muted);
       font-size: 14px;
     }
 
     .footer-inner {
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
       border-top: 1px solid rgba(255,255,255,0.08);
       padding-top: 20px;
     }
 
-    @media (max-width: 920px) {
+    @media (max-width: 980px) {
       .hero-grid,
+      .grid-3,
+      .pricing,
       .waitlist,
-      .cards,
-      .feature-list {
+      .how-grid,
+      .use-grid {
         grid-template-columns: 1fr;
       }
 
@@ -425,27 +655,26 @@
       }
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 760px) {
       .nav-inner {
         flex-direction: column;
-        gap: 12px;
+        align-items: flex-start;
       }
 
       .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: 14px;
       }
 
-      .stats {
+      .card-stats {
         grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 42px;
       }
 
       .section-title {
         font-size: 28px;
+      }
+
+      h1 {
+        font-size: 42px;
       }
     }
   </style>
@@ -457,41 +686,49 @@
       <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#use-cases">Use cases</a>
-        <a href="#waitlist">Waitlist</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn-secondary" href="#waitlist">Join waitlist</a>
       </div>
     </div>
   </nav>
 
   <header class="hero">
     <div class="container hero-grid">
-      <div>
+      <div class="hero-copy">
         <div class="eyebrow">OSINT air activity monitor</div>
         <h1>Track military aircraft activity in real time.</h1>
         <p>
           SpyAir helps analysts, journalists, researchers, and aviation enthusiasts
           monitor military and government aircraft, discover unusual movements,
-          and receive alerts when activity matters.
+          and receive alerts when activity matters most.
         </p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#waitlist">Join the waitlist</a>
+          <a class="btn btn-primary" href="#waitlist">Get early access</a>
           <a class="btn btn-secondary" href="#features">See features</a>
         </div>
-        <div class="mini-note">
-          Live map • alerts • watchlists • activity hotspots
+        <div class="hero-note">
+          Live map • alerts • watchlists • route history • regional hotspots
         </div>
       </div>
 
       <div class="hero-card">
-        <div class="map-box">
-          <div class="grid-lines"></div>
-          <div class="flight-line"></div>
-          <div class="flight-line two"></div>
-          <div class="dot one"></div>
-          <div class="dot two"></div>
+        <div class="radar">
+          <div class="grid"></div>
+          <div class="ring"></div>
+          <div class="sweep"></div>
+          <div class="cross-x"></div>
+          <div class="cross-y"></div>
+          <div class="track one"></div>
+          <div class="track two"></div>
+          <div class="ping one"></div>
+          <div class="ping two"></div>
           <div class="plane one">✈️</div>
           <div class="plane two">✈️</div>
         </div>
-        <div class="stats">
+
+        <div class="card-stats">
           <div class="stat">
             <strong>24/7</strong>
             <span>Live monitoring</span>
@@ -502,7 +739,7 @@
           </div>
           <div class="stat">
             <strong>Replay</strong>
-            <span>Route history</span>
+            <span>Recent routes</span>
           </div>
         </div>
       </div>
@@ -511,15 +748,17 @@
 
   <section id="features">
     <div class="container">
-      <h2 class="section-title">Built for signal, not noise</h2>
-      <p class="section-subtitle">
-        SpyAir focuses on the features that matter most for monitoring military
-        and government aircraft activity, without overwhelming you with clutter.
-      </p>
+      <div class="section-head">
+        <h2 class="section-title">Built for signal, not noise</h2>
+        <p class="section-subtitle">
+          SpyAir focuses on military and government air activity so you can spot
+          what matters faster, with less clutter and more context.
+        </p>
+      </div>
 
-      <div class="cards">
+      <div class="grid-3">
         <div class="card">
-          <div class="card-icon">🎯</div>
+          <div class="icon">🎯</div>
           <h3>Military-only filtering</h3>
           <p>
             Focus on tankers, transports, ISR, AEW&C, and government aircraft
@@ -528,20 +767,20 @@
         </div>
 
         <div class="card">
-          <div class="card-icon">🚨</div>
+          <div class="icon">🚨</div>
           <h3>Smart alerts</h3>
           <p>
             Get notified when aircraft enter a region, depart from key bases,
-            loiter, or match your watchlist.
+            loiter unusually, or match your watchlist.
           </p>
         </div>
 
         <div class="card">
-          <div class="card-icon">🌍</div>
-          <h3>Hotspot map</h3>
+          <div class="icon">🌍</div>
+          <h3>Regional hotspots</h3>
           <p>
-            Monitor where activity is rising across regions like the Baltics,
-            Eastern Europe, the Black Sea, or the Middle East.
+            Monitor rising activity across the Baltics, Eastern Europe, the Black Sea,
+            the Middle East, and other priority regions.
           </p>
         </div>
       </div>
@@ -550,36 +789,153 @@
 
   <section id="use-cases">
     <div class="container">
-      <h2 class="section-title">What you will be able to do</h2>
-      <p class="section-subtitle">
-        Start with a fast live tracker, then layer in watchlists, alerts, and
-        historical context for deeper analysis.
-      </p>
+      <div class="section-head">
+        <h2 class="section-title">What you will be able to do</h2>
+        <p class="section-subtitle">
+          Start with a fast live tracker, then layer in watchlists, alerts,
+          and historical context for deeper analysis.
+        </p>
+      </div>
 
-      <div class="feature-list">
-        <div class="feature-item">
+      <div class="use-grid">
+        <div class="use-item">
           <strong>Live activity map</strong>
           <span>See active military and government aircraft on a clean real-time map.</span>
         </div>
-        <div class="feature-item">
+        <div class="use-item">
           <strong>Watch specific aircraft</strong>
           <span>Follow selected tail numbers, hex codes, operators, and aircraft types.</span>
         </div>
-        <div class="feature-item">
+        <div class="use-item">
           <strong>Historical replay</strong>
           <span>Review movement patterns, recent routes, and activity windows.</span>
         </div>
-        <div class="feature-item">
+        <div class="use-item">
           <strong>Regional monitoring</strong>
           <span>Create your own zones and keep track of movements around them.</span>
         </div>
-        <div class="feature-item">
+        <div class="use-item">
           <strong>Operator insights</strong>
           <span>Group activity by mission type, aircraft family, or operator.</span>
         </div>
-        <div class="feature-item">
+        <div class="use-item">
           <strong>OSINT workflow ready</strong>
           <span>Use SpyAir as a fast dashboard for analysts, media, and researchers.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">How it works</h2>
+        <p class="section-subtitle">
+          SpyAir is designed to help you go from raw flight data to useful signals in seconds.
+        </p>
+      </div>
+
+      <div class="how-grid">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h4>Monitor the map</h4>
+          <p>See aircraft activity as it unfolds with a military-focused live view.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h4>Filter the noise</h4>
+          <p>Narrow by aircraft family, operator, mission type, or region.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h4>Set alerts</h4>
+          <p>Get notified when specific aircraft or movements match your criteria.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h4>Analyze patterns</h4>
+          <p>Review route history and activity spikes to spot unusual movement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">Simple pricing</h2>
+        <p class="section-subtitle">
+          Start free, then unlock alerts, history, and advanced monitoring tools.
+        </p>
+      </div>
+
+      <div class="pricing">
+        <div class="price-card">
+          <h3>Free</h3>
+          <div class="price-tag">$0</div>
+          <p class="price-sub">For casual tracking</p>
+          <div class="price-list">
+            <div class="price-item">Live military activity map</div>
+            <div class="price-item">Basic filters</div>
+            <div class="price-item">Limited object details</div>
+          </div>
+          <a class="btn btn-secondary" href="#waitlist">Start free</a>
+        </div>
+
+        <div class="price-card featured">
+          <h3>Pro</h3>
+          <div class="price-tag">$19</div>
+          <p class="price-sub">For OSINT and aviation power users</p>
+          <div class="price-list">
+            <div class="price-item">Everything in Free</div>
+            <div class="price-item">Custom alerts and watchlists</div>
+            <div class="price-item">Historical replay and route history</div>
+            <div class="price-item">Regional monitoring tools</div>
+          </div>
+          <a class="btn btn-primary" href="#waitlist">Join waitlist</a>
+        </div>
+
+        <div class="price-card">
+          <h3>Team</h3>
+          <div class="price-tag">Custom</div>
+          <p class="price-sub">For media, research, and analysts</p>
+          <div class="price-list">
+            <div class="price-item">Shared workspaces</div>
+            <div class="price-item">Advanced monitoring rules</div>
+            <div class="price-item">Priority support</div>
+            <div class="price-item">Custom data workflows</div>
+          </div>
+          <a class="btn btn-secondary" href="#waitlist">Contact us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="section-title">FAQ</h2>
+        <p class="section-subtitle">
+          Quick answers for early visitors and future users.
+        </p>
+      </div>
+
+      <div class="faq">
+        <div class="faq-item">
+          <strong>Who is SpyAir for?</strong>
+          <span>SpyAir is built for analysts, journalists, researchers, aviation enthusiasts, and OSINT users who want a cleaner view of military and government air activity.</span>
+        </div>
+        <div class="faq-item">
+          <strong>Will SpyAir have alerts?</strong>
+          <span>Yes. Alerts are planned for aircraft watchlists, geofenced zones, key airbases, loitering behavior, and unusual activity spikes.</span>
+        </div>
+        <div class="faq-item">
+          <strong>Will there be route history?</strong>
+          <span>Yes. The roadmap includes recent route history, replay, and monitoring of recurring activity patterns.</span>
+        </div>
+        <div class="faq-item">
+          <strong>Can I get early access?</strong>
+          <span>Yes. Join the waitlist below and you will be among the first to hear when early access opens.</span>
         </div>
       </div>
     </div>
@@ -592,7 +948,7 @@
           <h3>Get early access to SpyAir</h3>
           <p>
             Join the waitlist and be first to test the military aircraft tracker,
-            alerts, and live monitoring dashboard.
+            live monitoring dashboard, alerts, and route history.
           </p>
         </div>
 
