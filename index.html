@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SpyAir — Military aircraft tracking and alerts</title>
+  <title>SpyAir — Live military aircraft tracking</title>
   <meta
     name="description"
     content="SpyAir is a military aircraft tracking and alerting platform for analysts, journalists, researchers, and aviation enthusiasts."
   />
-  <meta property="og:title" content="SpyAir — Military aircraft tracking and alerts" />
+  <meta property="og:title" content="SpyAir — Live military aircraft tracking" />
   <meta
     property="og:description"
-    content="Track military aircraft activity in real time with alerts, watchlists, and route history."
+    content="Track aircraft activity in real time with live OpenSky data."
   />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#06101c" />
@@ -38,13 +38,8 @@
       --max-width: 1160px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -434,6 +429,11 @@
       font-weight: 600;
     }
 
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
     #mapContainer {
       height: 520px;
       border-radius: 18px;
@@ -472,139 +472,6 @@
       font-size: 15px;
     }
 
-    .use-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-    }
-
-    .use-item {
-      padding: 16px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .use-item strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 16px;
-    }
-
-    .use-item span {
-      color: var(--muted);
-      line-height: 1.65;
-      font-size: 14px;
-    }
-
-    .how-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    .step {
-      padding: 18px;
-      border-radius: 18px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-    }
-
-    .step-number {
-      width: 34px;
-      height: 34px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: rgba(125, 211, 252, 0.12);
-      color: var(--accent);
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .step h4 {
-      margin: 0 0 8px;
-      font-size: 17px;
-    }
-
-    .step p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.65;
-      font-size: 14px;
-    }
-
-    .pricing {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
-
-    .price-card {
-      padding: 24px;
-      border-radius: 22px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-    }
-
-    .price-card.featured {
-      background: linear-gradient(180deg, rgba(125, 211, 252, 0.10), rgba(255,255,255,0.04));
-      border-color: var(--border-strong);
-    }
-
-    .badge {
-      display: inline-block;
-      margin-bottom: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-      background: rgba(125, 211, 252, 0.10);
-      border: 1px solid rgba(125, 211, 252, 0.18);
-    }
-
-    .price-card h3 {
-      margin: 0 0 8px;
-      font-size: 22px;
-    }
-
-    .price-tag {
-      font-size: 34px;
-      font-weight: 800;
-      margin: 0 0 6px;
-    }
-
-    .price-sub {
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .price-list {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .price-item {
-      position: relative;
-      padding-left: 18px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .price-item::before {
-      content: "•";
-      position: absolute;
-      left: 0;
-      top: 0;
-      color: var(--accent);
-    }
-
     .faq {
       display: grid;
       gap: 14px;
@@ -627,66 +494,6 @@
       color: var(--muted);
       font-size: 14px;
       line-height: 1.7;
-    }
-
-    .waitlist {
-      display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      gap: 20px;
-      align-items: center;
-      padding: 28px;
-      border-radius: 24px;
-      background: linear-gradient(180deg, rgba(125, 211, 252, 0.09), rgba(255,255,255,0.03));
-      border: 1px solid rgba(125, 211, 252, 0.16);
-      box-shadow: var(--shadow);
-    }
-
-    .waitlist h3 {
-      margin: 0 0 10px;
-      font-size: 31px;
-    }
-
-    .waitlist p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-
-    .waitlist-box {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    .coming-soon {
-      width: 100%;
-      max-width: 420px;
-      padding: 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.10);
-      text-align: center;
-    }
-
-    .coming-soon strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 18px;
-    }
-
-    .coming-soon span {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-      display: block;
-      margin-bottom: 14px;
-    }
-
-    .disclaimer {
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
     }
 
     .footer {
@@ -714,20 +521,13 @@
     .leaflet-popup-content {
       color: #f3f7fc;
       line-height: 1.5;
+      min-width: 200px;
     }
 
     @media (max-width: 980px) {
       .hero-grid,
-      .grid-3,
-      .pricing,
-      .waitlist,
-      .how-grid,
-      .use-grid {
+      .grid-3 {
         grid-template-columns: 1fr;
-      }
-
-      .waitlist-box {
-        justify-content: flex-start;
       }
     }
 
@@ -766,9 +566,6 @@
       <div class="nav-links">
         <a href="#map">Map</a>
         <a href="#features">Features</a>
-        <a href="#use-cases">Use cases</a>
-        <a href="#how">How it works</a>
-        <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
       </div>
     </div>
@@ -777,19 +574,18 @@
   <header class="hero" id="top">
     <div class="container hero-grid">
       <div class="hero-copy">
-        <div class="eyebrow">OSINT air activity monitor</div>
-        <h1>Track military aircraft activity in real time.</h1>
+        <div class="eyebrow">Live OpenSky integration</div>
+        <h1>Track aircraft activity with real data.</h1>
         <p>
-          SpyAir helps analysts, journalists, researchers, and aviation enthusiasts
-          monitor military and government aircraft, discover unusual movements,
-          and receive alerts when activity matters most.
+          This version of SpyAir pulls live aircraft state vectors from OpenSky over Poland and nearby airspace.
+          It is the first real-data step before adding military-focused filtering and alerts.
         </p>
         <div class="hero-actions">
-          <a class="btn btn-primary" href="#map">Open demo map</a>
-          <a class="btn btn-secondary" href="#features">See features</a>
+          <a class="btn btn-primary" href="#map">Open live map</a>
+          <a class="btn btn-secondary" href="#faq">See notes</a>
         </div>
         <div class="hero-note">
-          Live map • alerts • watchlists • route history • regional hotspots
+          Real API • automatic refresh • Central Europe bounding box
         </div>
       </div>
 
@@ -812,16 +608,16 @@
 
         <div class="card-stats">
           <div class="stat">
-            <strong>24/7</strong>
-            <span>Live monitoring</span>
+            <strong id="aircraftCount">0</strong>
+            <span>Tracked aircraft</span>
           </div>
           <div class="stat">
-            <strong>Zones</strong>
-            <span>Custom alerts</span>
+            <strong>20s</strong>
+            <span>Refresh interval</span>
           </div>
           <div class="stat">
-            <strong>Replay</strong>
-            <span>Recent routes</span>
+            <strong>Live</strong>
+            <span>OpenSky feed</span>
           </div>
         </div>
       </div>
@@ -831,20 +627,20 @@
   <section id="map">
     <div class="container">
       <div class="section-head">
-        <h2 class="section-title">Live military air activity demo</h2>
+        <h2 class="section-title">Live aircraft map</h2>
         <p class="section-subtitle">
-          This is the first working SpyAir map. It currently uses demo aircraft positions so the product already looks and feels live.
+          Current state vectors from OpenSky for Poland and nearby countries.
         </p>
       </div>
 
       <div class="map-shell">
         <div class="map-topbar">
           <div class="map-badges">
-            <div class="map-badge">Demo data</div>
-            <div class="map-badge">Central Europe</div>
-            <div class="map-badge">Military aircraft view</div>
+            <div class="map-badge">OpenSky API</div>
+            <div class="map-badge">Bounding box</div>
+            <div class="map-badge">Auto refresh</div>
           </div>
-          <div class="hero-note">Next step: real ADS-B data</div>
+          <div class="status" id="mapStatus">Loading live data…</div>
         </div>
 
         <div id="mapContainer"></div>
@@ -855,164 +651,35 @@
   <section id="features">
     <div class="container">
       <div class="section-head">
-        <h2 class="section-title">Built for signal, not noise</h2>
+        <h2 class="section-title">What this version already does</h2>
         <p class="section-subtitle">
-          SpyAir focuses on military and government air activity so you can spot
-          what matters faster, with less clutter and more context.
+          This is not mock data anymore. It already fetches real aircraft states and puts them on the map.
         </p>
       </div>
 
       <div class="grid-3">
         <div class="card">
-          <div class="icon">🎯</div>
-          <h3>Military-only filtering</h3>
+          <div class="icon">📡</div>
+          <h3>Real state vectors</h3>
           <p>
-            Focus on tankers, transports, ISR, AEW&amp;C, and government aircraft
-            with cleaner views and faster discovery.
+            Aircraft are loaded from the OpenSky state vector endpoint for a selected geographic area.
           </p>
         </div>
 
         <div class="card">
-          <div class="icon">🚨</div>
-          <h3>Smart alerts</h3>
+          <div class="icon">🔄</div>
+          <h3>Automatic refresh</h3>
           <p>
-            Get notified when aircraft enter a region, depart from key bases,
-            loiter unusually, or match your watchlist.
+            The map updates every 20 seconds and redraws the current active aircraft positions.
           </p>
         </div>
 
         <div class="card">
-          <div class="icon">🌍</div>
-          <h3>Regional hotspots</h3>
+          <div class="icon">🧱</div>
+          <h3>Ready for filtering</h3>
           <p>
-            Monitor rising activity across the Baltics, Eastern Europe, the Black Sea,
-            the Middle East, and other priority regions.
+            Next step is adding aircraft-type filters, watchlists, and military heuristics on top.
           </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="use-cases">
-    <div class="container">
-      <div class="section-head">
-        <h2 class="section-title">What you will be able to do</h2>
-        <p class="section-subtitle">
-          Start with a fast live tracker, then layer in watchlists, alerts,
-          and historical context for deeper analysis.
-        </p>
-      </div>
-
-      <div class="use-grid">
-        <div class="use-item">
-          <strong>Live activity map</strong>
-          <span>See active military and government aircraft on a clean real-time map.</span>
-        </div>
-        <div class="use-item">
-          <strong>Watch specific aircraft</strong>
-          <span>Follow selected tail numbers, hex codes, operators, and aircraft types.</span>
-        </div>
-        <div class="use-item">
-          <strong>Historical replay</strong>
-          <span>Review movement patterns, recent routes, and activity windows.</span>
-        </div>
-        <div class="use-item">
-          <strong>Regional monitoring</strong>
-          <span>Create your own zones and keep track of movements around them.</span>
-        </div>
-        <div class="use-item">
-          <strong>Operator insights</strong>
-          <span>Group activity by mission type, aircraft family, or operator.</span>
-        </div>
-        <div class="use-item">
-          <strong>OSINT workflow ready</strong>
-          <span>Use SpyAir as a fast dashboard for analysts, media, and researchers.</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="how">
-    <div class="container">
-      <div class="section-head">
-        <h2 class="section-title">How it works</h2>
-        <p class="section-subtitle">
-          SpyAir is designed to help you go from raw flight data to useful signals in seconds.
-        </p>
-      </div>
-
-      <div class="how-grid">
-        <div class="step">
-          <div class="step-number">1</div>
-          <h4>Monitor the map</h4>
-          <p>See aircraft activity as it unfolds with a military-focused live view.</p>
-        </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <h4>Filter the noise</h4>
-          <p>Narrow by aircraft family, operator, mission type, or region.</p>
-        </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <h4>Set alerts</h4>
-          <p>Get notified when specific aircraft or movements match your criteria.</p>
-        </div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <h4>Analyze patterns</h4>
-          <p>Review route history and activity spikes to spot unusual movement.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="pricing">
-    <div class="container">
-      <div class="section-head">
-        <h2 class="section-title">Simple pricing</h2>
-        <p class="section-subtitle">
-          Start free, then unlock alerts, history, and advanced monitoring tools.
-        </p>
-      </div>
-
-      <div class="pricing">
-        <div class="price-card">
-          <h3>Free</h3>
-          <div class="price-tag">$0</div>
-          <p class="price-sub">For casual tracking</p>
-          <div class="price-list">
-            <div class="price-item">Live military activity map</div>
-            <div class="price-item">Basic filters</div>
-            <div class="price-item">Limited object details</div>
-          </div>
-          <a class="btn btn-secondary" href="#map">Open map</a>
-        </div>
-
-        <div class="price-card featured">
-          <div class="badge">Most popular</div>
-          <h3>Pro</h3>
-          <div class="price-tag">$19</div>
-          <p class="price-sub">For OSINT and aviation power users</p>
-          <div class="price-list">
-            <div class="price-item">Everything in Free</div>
-            <div class="price-item">Custom alerts and watchlists</div>
-            <div class="price-item">Historical replay and route history</div>
-            <div class="price-item">Regional monitoring tools</div>
-          </div>
-          <a class="btn btn-primary" href="#map">See demo</a>
-        </div>
-
-        <div class="price-card">
-          <h3>Team</h3>
-          <div class="price-tag">Custom</div>
-          <p class="price-sub">For media, research, and analysts</p>
-          <div class="price-list">
-            <div class="price-item">Shared workspaces</div>
-            <div class="price-item">Advanced monitoring rules</div>
-            <div class="price-item">Priority support</div>
-            <div class="price-item">Custom data workflows</div>
-          </div>
-          <a class="btn btn-secondary" href="#faq">Learn more</a>
         </div>
       </div>
     </div>
@@ -1021,54 +688,24 @@
   <section id="faq">
     <div class="container">
       <div class="section-head">
-        <h2 class="section-title">FAQ</h2>
+        <h2 class="section-title">Important notes</h2>
         <p class="section-subtitle">
-          Quick answers for early visitors and future users.
+          Before we build on this, there are two practical limits to know.
         </p>
       </div>
 
       <div class="faq">
         <div class="faq-item">
-          <strong>Is the map live?</strong>
-          <span>This version is a working demo with mock aircraft positions. The next version will connect real flight data.</span>
+          <strong>Will this show only military aircraft?</strong>
+          <span>Not yet. OpenSky returns aircraft state vectors; military filtering has to be added by our own logic on top.</span>
         </div>
         <div class="faq-item">
-          <strong>Will SpyAir have alerts?</strong>
-          <span>Yes. Alerts are planned for aircraft watchlists, geofenced zones, key airbases, loitering behavior, and unusual activity spikes.</span>
+          <strong>Can this be used commercially as-is?</strong>
+          <span>Not safely. OpenSky’s terms say for-profit use requires written permission, so this version is best for testing and prototyping first.</span>
         </div>
         <div class="faq-item">
-          <strong>Will there be route history?</strong>
-          <span>Yes. The roadmap includes recent route history, replay, and monitoring of recurring activity patterns.</span>
-        </div>
-        <div class="faq-item">
-          <strong>What comes next?</strong>
-          <span>The next step is replacing the demo markers with real aircraft data and then adding military-focused filters.</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="waitlist">
-    <div class="container">
-      <div class="waitlist">
-        <div>
-          <h3>SpyAir is now taking shape</h3>
-          <p>
-            The landing page and working map demo are live. Next we connect real aircraft data and start building the first real tracker.
-          </p>
-          <div class="disclaimer">
-            You now have a visible product demo instead of only a static landing page.
-          </div>
-        </div>
-
-        <div class="waitlist-box">
-          <div class="coming-soon">
-            <strong>Next step</strong>
-            <span>
-              Connect real aircraft positions, add military filters, and turn this into the first working SpyAir dashboard.
-            </span>
-            <a class="btn btn-primary" href="#map">Open demo map</a>
-          </div>
+          <strong>What if the feed fails or gets rate-limited?</strong>
+          <span>Then the next version should move the API call behind a Cloudflare Worker proxy with caching and retries.</span>
         </div>
       </div>
     </div>
@@ -1077,7 +714,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div>© 2026 SpyAir</div>
-      <div>Military aircraft tracking and alerts</div>
+      <div>Live aircraft tracking prototype</div>
     </div>
   </footer>
 
@@ -1090,68 +727,108 @@
   <script>
     const map = L.map("mapContainer", {
       zoomControl: true
-    }).setView([52.1, 19.4], 5);
+    }).setView([52.1, 19.4], 6);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(map);
 
-    const aircraft = [
-      {
-        lat: 52.2297,
-        lng: 21.0122,
-        name: "NATO Tanker",
-        type: "KC-135 Stratotanker",
-        status: "Active over Poland"
-      },
-      {
-        lat: 54.352,
-        lng: 18.6466,
-        name: "AWACS",
-        type: "E-3 Sentry",
-        status: "Baltic surveillance"
-      },
-      {
-        lat: 50.0647,
-        lng: 19.945,
-        name: "Military Transport",
-        type: "C-130 Hercules",
-        status: "Transit route"
-      },
-      {
-        lat: 53.4285,
-        lng: 14.5528,
-        name: "Recon Platform",
-        type: "RQ-4 Global Hawk",
-        status: "Recon activity"
-      },
-      {
-        lat: 51.1079,
-        lng: 17.0385,
-        name: "Air Mobility",
-        type: "C-17 Globemaster III",
-        status: "Regional logistics"
-      }
-    ];
+    const mapStatus = document.getElementById("mapStatus");
+    const aircraftCount = document.getElementById("aircraftCount");
+
+    const markersLayer = L.layerGroup().addTo(map);
 
     const planeIcon = L.divIcon({
-      html: '<div style="font-size:18px;">✈️</div>',
+      html: '<div style="font-size:18px; transform: rotate(45deg);">✈️</div>',
       className: "",
       iconSize: [24, 24],
       iconAnchor: [12, 12]
     });
 
-    aircraft.forEach((plane) => {
-      const marker = L.marker([plane.lat, plane.lng], { icon: planeIcon }).addTo(map);
+    const bounds = {
+      lamin: 48.5,
+      lamax: 56.5,
+      lomin: 13.0,
+      lomax: 25.0
+    };
 
-      marker.bindPopup(`
-        <div style="min-width: 180px;">
-          <strong>${plane.name}</strong><br />
-          <span>${plane.type}</span><br />
-          <span style="color:#9eb0c8;">${plane.status}</span>
-        </div>
-      `);
-    });
+    function formatAlt(meters) {
+      if (meters === null || meters === undefined) return "Unknown";
+      return Math.round(meters * 3.28084).toLocaleString() + " ft";
+    }
+
+    function formatSpeed(ms) {
+      if (ms === null || ms === undefined) return "Unknown";
+      return Math.round(ms * 1.94384) + " kt";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    async function loadAircraft() {
+      const url = `https://opensky-network.org/api/states/all?lamin=${bounds.lamin}&lamax=${bounds.lamax}&lomin=${bounds.lomin}&lomax=${bounds.lomax}`;
+
+      mapStatus.textContent = "Refreshing live data…";
+
+      try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const states = Array.isArray(data.states) ? data.states : [];
+
+        markersLayer.clearLayers();
+
+        const validStates = states.filter((s) =>
+          s &&
+          s[5] !== null && // longitude
+          s[6] !== null && // latitude
+          s[8] === false   // on_ground = false
+        );
+
+        validStates.forEach((s) => {
+          const icao24 = s[0];
+          const callsign = (s[1] || "").trim() || "Unknown";
+          const originCountry = s[2] || "Unknown";
+          const longitude = s[5];
+          const latitude = s[6];
+          const baroAltitude = s[7];
+          const velocity = s[9];
+          const trueTrack = s[10];
+
+          const marker = L.marker([latitude, longitude], { icon: planeIcon });
+
+          marker.bindPopup(`
+            <div>
+              <strong>${escapeHtml(callsign)}</strong><br />
+              ICAO24: ${escapeHtml(icao24)}<br />
+              Country: ${escapeHtml(originCountry)}<br />
+              Altitude: ${escapeHtml(formatAlt(baroAltitude))}<br />
+              Speed: ${escapeHtml(formatSpeed(velocity))}<br />
+              Track: ${trueTrack !== null && trueTrack !== undefined ? Math.round(trueTrack) + "°" : "Unknown"}
+            </div>
+          `);
+
+          marker.addTo(markersLayer);
+        });
+
+        aircraftCount.textContent = validStates.length.toLocaleString();
+        mapStatus.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+      } catch (error) {
+        console.error(error);
+        mapStatus.textContent = "Live data failed to load. This can happen بسبب rate limits or API access issues.";
+      }
+    }
+
+    loadAircraft();
+    setInterval(loadAircraft, 20000);
   </script>
 </body>
 </html>
